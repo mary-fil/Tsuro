@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { UIHandler } from '../helpers/UIHandler';
 
 export class Boot extends Scene
 {
@@ -17,7 +18,8 @@ export class Boot extends Scene
 
     create ()
     {
-        console.log("Hello world");
+        this.UIHandler = new UIHandler(this);
+        this.UIHandler.buildUI();
         //this.scene.start('Preloader');
     }
 
