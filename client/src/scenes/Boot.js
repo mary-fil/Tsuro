@@ -37,7 +37,7 @@ export class Boot extends Scene
         this.UIHandler = new UIHandler(this);
         this.UIHandler.buildUI();
 
-        this.InteractiveHandler = new InteractiveHandler();
+        this.InteractiveHandler = new InteractiveHandler(this);
         //this.scene.start('Preloader');
     }
 
