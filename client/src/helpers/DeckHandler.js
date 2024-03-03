@@ -4,7 +4,7 @@ import CardBack from "./cards/CardBack";
 //shuffling cards
 
 export default class DeckHandler{
-    constructor() {
+    constructor(scene) {
         this.dealCard = (x, y, name, type) => {
             let newCard = new CardBack(scene);
             return(newCard.render(x,y,type));

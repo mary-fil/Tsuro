@@ -25,14 +25,16 @@ export class Boot extends Scene
         this.load.image('tile4', 'assets/tile4.png');
         this.load.image('tile5', 'assets/tile5.png');
         this.load.image('tile6', 'assets/tile6.png');
+        this.load.image('bluetile_back', 'assets/bluetile_back.png');
+        this.load.image('redtile_back', 'assets/redtile_back.png');
     }
 
     create ()
     {
         this.CardHandler = new CardHandler();
-        this.DeckHandler = new DeckHandler();
-        this.GameHandler = new GameHandler();
-        this.SocketHandler = new SocketHandler();
+        this.DeckHandler = new DeckHandler(this);
+        this.GameHandler = new GameHandler(this);
+        this.SocketHandler = new SocketHandler(this);
         
         this.UIHandler = new UIHandler(this);
         this.UIHandler.buildUI();

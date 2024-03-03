@@ -4,7 +4,7 @@ export default class CardBack extends Card{
     constructor(scene) {
         super(scene);
         this.name = "cardBack";
-        this.playerCardSprite = "blueCardBack";
-        this.opponentCardSprite = "redCardBlack";
+        this.playerCardSprite = "bluetile_back";
+        this.opponentCardSprite = "redtile_back";
     }
 }
