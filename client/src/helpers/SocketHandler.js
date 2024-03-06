@@ -24,6 +24,10 @@ export default class SocketHandler{
             }
         })
 
+        scene.socket.on('changeTurn', () => {
+            scene.GameHandler.changeTurn();
+        })
+
         scene.socket.on('dealCards', (socketId, cards) => {
             if (socketId === scene.socket.id) {
                 for(let i in cards){
@@ -39,8 +43,9 @@ export default class SocketHandler{
         scene.socket.on('cardPlayed', (cardName, socketId) => {
             if (socketId !== scene.socket.id) {
                 scene.GameHandler.opponentHand.shift().destroy();
-                scene.DeckHandler.dealCard(scene.dropZone.x, scene.dropZone.y, cardName, "opponentCard");
+                scene.DeckHandler.dealCard((scene.dropZone.x - 350) + (scene.dropZone.data.values.cards * 50), scene.dropZone.y, cardName, "opponentCard");
             }
+            scene.dropZone.data.values.cards++;
         })
     }
 }

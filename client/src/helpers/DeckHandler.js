@@ -6,7 +6,7 @@ import CardBack from "./cards/CardBack";
 export default class DeckHandler{
     constructor(scene) {
         this.dealCard = (x, y, name, type) => {
-            let newCard = new CardBack(scene);
+            let newCard = new CardBack(scene);  //do zmiany bo na razie wystawia same tyły kart
             return(newCard.render(x,y,type));
         }
     }

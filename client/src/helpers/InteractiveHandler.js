@@ -3,7 +3,7 @@ export default class InteractiveHandler{
     constructor(scene) {
         
         scene.dealCards.on('pointerdown', () => {
-            scene.socket.emit("dealCards", scene.socket.id);
+            scene.socket.emit('dealCards', scene.socket.id);
             scene.dealCards.disableInteractive();
         })
 
@@ -13,6 +13,11 @@ export default class InteractiveHandler{
 
         scene.dealCards.on('pointerout', () => {
             scene.dealCards.setColor('#00ffff');
+        })
+
+        scene.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+            gameObject.x = dragX;
+            gameObject.y = dragY;
         })
 
         scene.input.on('dragstart', (pointer, gameObject) => {
@@ -30,8 +35,9 @@ export default class InteractiveHandler{
 
         scene.input.on('drop', (pointer, gameObject, dropZone) => {
             if(scene.GameHandler.isMyTurn && scene.GameHandler.gameState === "Ready") {
-                gameObject.x = dropZone.x;
+                gameObject.x = (dropZone.x - 350) + (dropZone.data.values.cards * 50);
                 gameObject.y = dropZone.y;
+                scene.dropZone.data.values.cards++;
                 scene.input.setDraggable(gameObject, false);
                 scene.socket.emit('cardPlayed', gameObject.data.values.name, scene.socket.id);
             }
