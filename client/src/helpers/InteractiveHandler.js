@@ -1,6 +1,8 @@
 
 export default class InteractiveHandler{
     constructor(scene) {
+
+        scene.cardPreview = null;
         
         scene.dealCards.on('pointerdown', () => {
             scene.socket.emit('dealCards', scene.socket.id);
@@ -15,6 +17,19 @@ export default class InteractiveHandler{
             scene.dealCards.setColor('#00ffff');
         })
 
+        scene.input.on('pointerover', (event, gameObjects) => {
+            let pointer = scene.input.activePointer;
+            if(gameObjects[0].type === "Image") {//&& gameObjects[0].data.list.name !== "cardBack" 
+                scene.cardPreview = scene.add.image(pointer.worldX, pointer.worldY, gameObjects[0].data.values.sprite).setScale(0.5, 0.5);
+            }
+        })
+
+        scene.input.on('pointerout', (event, gameObjects) => {
+            if(gameObjects[0].type === "Image"){//&& gameObjects[0].data.list.name !== "cardBack"
+                scene.cardPreview.setVisible(false);
+            }
+        })
+
         scene.input.on('drag', (pointer, gameObject, dragX, dragY) => {
             gameObject.x = dragX;
             gameObject.y = dragY;
@@ -23,6 +38,7 @@ export default class InteractiveHandler{
         scene.input.on('dragstart', (pointer, gameObject) => {
             gameObject.setTint(0xff69b4);
             scene.children.bringToTop(gameObject);
+            scene.cardPreview.setVisible(false);
         })
 
         scene.input.on('dragend', (pointer, gameObject, dropped) => {

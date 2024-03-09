@@ -31,6 +31,7 @@ export class UIHandler {
 
         this.buildGameText = () => {
             scene.dealCards = scene.add.text(960, 445, "Deal cards").setFontSize(14).setFontFamily("Trebuchet MS");
+            
         }
 
         this.buildUI = () => {
@@ -39,5 +40,7 @@ export class UIHandler {
             this.buildGameText();
             
         }
+
+
     }
 }
