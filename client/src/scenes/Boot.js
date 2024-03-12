@@ -1,10 +1,4 @@
 import { Scene } from 'phaser';
-// import { UIHandler } from '../helpers/UIHandler';
-// import InteractiveHandler from '../helpers/InteractiveHandler';
-// import CardHandler from '../helpers/CardHandler';
-// import DeckHandler from '../helpers/DeckHandler';
-// import SocketHandler from '../helpers/SocketHandler';
-// import GameHandler from '../helpers/GameHandler';
 
 export class Boot extends Scene
 {

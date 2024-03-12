@@ -14,23 +14,27 @@ export class Game extends Scene
     }
 
     create ()
-    {
-        // this.cameras.main.setBackgroundColor(0x00ff00);
+    {   
+        // create border
+        let border = this.add.graphics();
+        border.fillStyle(0x336699, 1);
+        border.fillRect(450 + 25, 25, 650, 650);
 
-        // this.add.image(512, 384, 'background').setAlpha(0.5);
+        // create tilemap
+        let background = this.add.image(800, 350, 'board');
+        
+        // 612 : 6 = 102
+        const map = this.make.tilemap({ tileWidth: 100, tileHeight: 100, width: 6, height: 6 });
 
-        // this.add.text(512, 384, 'Make something fun!\nand share it with us:\nsupport@phaser.io', {
-        //     fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-        //     stroke: '#000000', strokeThickness: 8,
-        //     align: 'center'
-        // }).setOrigin(0.5);
+        const tiles = map.addTilesetImage('tileset');
 
-        // this.input.once('pointerdown', () => {
+        let layer = map.createBlankLayer('layer', tiles);
+        layer.x = 800 - 300;
+        layer.y = 350 - 300;
 
-        //     this.scene.start('GameOver');
+        map.putTileAt(1,0,0);
 
-        // });
-
+        // handlers
         this.CardHandler = new CardHandler();
         this.DeckHandler = new DeckHandler(this);
         this.GameHandler = new GameHandler(this);

@@ -19,17 +19,15 @@ export class Preloader extends Scene
 
         this.load.image('bluetile_back', 'bluetile_back.png');
         this.load.image('redtile_back', 'redtile_back.png');
-        this.load.image('tileset', 'tileset_blue.png');
+        this.load.image('tileset', 'tiles600v1.png');
+        this.load.image('board', 'boardblue.png');
+  
     }
 
     create ()
     {
         //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
         //  For example, you can define global animations here, so we can use them in other scenes.
-
-        const map = this.make.tilemap({ tileWidth: 247, tileHeight: 247, width: 6, height: 6 });
-
-        map.addTilesetImage('tileset');
 
 
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.

@@ -9,9 +9,6 @@ export class MainMenu extends Scene
 
     create ()
     {
-        // this.add.image(512, 384, 'background');
-
-        // this.add.image(512, 300, 'logo');
 
         this.add.text(512, 460, 'Start game', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',

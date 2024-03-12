@@ -35,7 +35,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on('dealCards', function (socketId) {
-        for(let i = 0; i < 5; i++){
+        for(let i = 0; i < 3; i++){
             if(players[socketId].inDeck.length === 0){
                 players[socketId].inDeck = shuffle(["playerCard"]);
             }

@@ -10,17 +10,17 @@ export default class InteractiveHandler{
         })
 
         scene.dealCards.on('pointerover', () => {
-            scene.dealCards.setColor('#ff69b4');
+            scene.dealCards.setColor('#336699');
         })
 
         scene.dealCards.on('pointerout', () => {
-            scene.dealCards.setColor('#00ffff');
+            scene.dealCards.setColor('#000000');
         })
 
         scene.input.on('pointerover', (event, gameObjects) => {
             let pointer = scene.input.activePointer;
             if(gameObjects[0].type === "Image") {//&& gameObjects[0].data.list.name !== "cardBack" 
-                scene.cardPreview = scene.add.image(pointer.worldX, pointer.worldY, gameObjects[0].data.values.sprite).setScale(0.5, 0.5);
+                scene.cardPreview = scene.add.image(pointer.worldX, pointer.worldY, gameObjects[0].data.values.sprite);
             }
         })
 
