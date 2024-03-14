@@ -27,6 +27,10 @@ io.on('connection', function (socket) {
         io.emit('firstTurn');
     }
 
+    // socket.on('placeMarker', function(socketId){
+    //     io.emit('changeGameState', 'Placing markers');
+    // })
+
     socket.on('dealDeck', function (socketId){
         players[socketId].inDeck = shuffle(["playerCard"]);
         console.log(players);

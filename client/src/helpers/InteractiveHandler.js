@@ -1,6 +1,8 @@
 
 export default class InteractiveHandler{
-    constructor(scene) {
+    constructor(scene, placesGroup) {
+
+        this.placesGroup = this.placesGroup;
 
         scene.cardPreview = null;
         
@@ -36,13 +38,17 @@ export default class InteractiveHandler{
         })
 
         scene.input.on('dragstart', (pointer, gameObject) => {
-            gameObject.setTint(0xff69b4);
-            scene.children.bringToTop(gameObject);
-            scene.cardPreview.setVisible(false);
+            if(gameObject.name === "cardBack") {
+                gameObject.setTint(0xff69b4);
+                scene.children.bringToTop(gameObject);
+                scene.cardPreview.setVisible(false);
+            }
         })
 
         scene.input.on('dragend', (pointer, gameObject, dropped) => {
-            gameObject.setTint();
+            if(gameObject.name === "cardBack") {
+                gameObject.setTint();
+            }
             if(!dropped){
                 gameObject.x = gameObject.input.dragStartX;
                 gameObject.y = gameObject.input.dragStartY;
@@ -50,7 +56,27 @@ export default class InteractiveHandler{
         })
 
         scene.input.on('drop', (pointer, gameObject, dropZone) => {
-            if(scene.GameHandler.isMyTurn && scene.GameHandler.gameState === "Ready") {
+            if (scene.GameHandler.isMyTurn && gameObject.type === 'pawn') {
+                let droppedInValidPlace = false;
+                placesGroup.children.each(space => {
+                    let bounds = space.getBounds();
+                    if (bounds.contains(pointer.x, pointer.y)) {
+                        droppedInValidPlace = true;
+                        gameObject.x = space.x;
+                        gameObject.y = space.y;
+                        space.disableInteractive();  // the place is occupied so disable it as a valid drop place
+                        gameObject.disableInteractive();
+                    }
+                });
+        
+                // If it wasn't dropped in a valid space, move it back to the start
+                if (!droppedInValidPlace) {
+                    gameObject.x = gameObject.input.dragStartX;
+                    gameObject.y = gameObject.input.dragStartY;
+                }
+        
+                // If the object is not a pawn, it must be a card
+            } else if(scene.GameHandler.isMyTurn && scene.GameHandler.gameState === "Ready") {
                 gameObject.x = (dropZone.x - 350) + (dropZone.data.values.cards * 50);
                 gameObject.y = dropZone.y;
                 scene.dropZone.data.values.cards++;

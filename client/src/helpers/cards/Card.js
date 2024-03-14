@@ -14,7 +14,8 @@ export default class Card {
             let card = scene.add.image(x, y, sprite).setInteractive().setData({
                 "name": this.name,
                 "type": type,
-                "sprite": sprite
+                "sprite": sprite,
+                "preview": true
             })
             if(type === 'playerCard'){
                 scene.input.setDraggable(card);
