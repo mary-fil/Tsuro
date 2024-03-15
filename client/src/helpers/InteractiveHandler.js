@@ -6,6 +6,7 @@ export default class InteractiveHandler{
 
         scene.cardPreview = null;
         
+        //cards
         scene.dealCards.on('pointerdown', () => {
             scene.socket.emit('dealCards', scene.socket.id);
             scene.dealCards.disableInteractive();
@@ -17,6 +18,27 @@ export default class InteractiveHandler{
 
         scene.dealCards.on('pointerout', () => {
             scene.dealCards.setColor('#000000');
+        })
+
+        //markers
+        scene.placeMarkers.on('pointerdown', () => {
+            
+            // placing marker
+            // enable moving of the marker
+            if (scene.GameHandler.isMyTurn) {
+                scene.marker = scene.add.circle(200, 250, 10, 0x000000);
+                scene.marker.type = 'marker';
+                scene.marker.isPlaced = false;
+                scene.marker.setInteractive({ draggable: true });
+            }
+        })
+
+        scene.placeMarkers.on('pointerover', () => {
+            scene.placeMarkers.setColor('#336699');
+        })
+
+        scene.placeMarkers.on('pointerout', () => {
+            scene.placeMarkers.setColor('#000000');
         })
 
         scene.input.on('pointerover', (event, gameObjects) => {
@@ -56,19 +78,24 @@ export default class InteractiveHandler{
         })
 
         scene.input.on('drop', (pointer, gameObject, dropZone) => {
-            if (scene.GameHandler.isMyTurn && gameObject.type === 'pawn') {
+            if (scene.GameHandler.isMyTurn && gameObject.type === 'marker') {
                 let droppedInValidPlace = false;
                 placesGroup.children.each(space => {
                     let bounds = space.getBounds();
                     if (bounds.contains(pointer.x, pointer.y)) {
-                        droppedInValidPlace = true;
-                        gameObject.x = space.x;
-                        gameObject.y = space.y;
-                        space.disableInteractive();  // the place is occupied so disable it as a valid drop place
-                        gameObject.disableInteractive();
+                        let x = space.x;
+                        let y = space.y;
+
+                        if (!(scene.GameHandler.opponentMarkerX === x && scene.GameHandler.opponentMarkerY === y)){
+                            droppedInValidPlace = true;
+                            gameObject.x = space.x;
+                            gameObject.y = space.y;
+                            gameObject.disableInteractive();
+                            scene.socket.emit('markerMoved', gameObject, scene.socket.id);
+                            console.log(droppedInValidPlace);
+                        }
                     }
                 });
-        
                 // If it wasn't dropped in a valid space, move it back to the start
                 if (!droppedInValidPlace) {
                     gameObject.x = gameObject.input.dragStartX;

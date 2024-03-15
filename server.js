@@ -4,7 +4,7 @@ const cors = require('cors');
 const shuffle = require('shuffle-array');
 let players = {};
 let readyCheck = 0;
-let gameState = "Initializing";
+let gameState = "";
 
 const io = require('socket.io')(http, {
     cors: {
@@ -19,7 +19,7 @@ io.on('connection', function (socket) {
     players[socket.id] = {
         inDeck: [],
         inHand: [],
-        isPlayerA: false
+        isPlayerA: false,
     }
 
     if(Object.keys(players).length < 2){
@@ -27,15 +27,16 @@ io.on('connection', function (socket) {
         io.emit('firstTurn');
     }
 
-    // socket.on('placeMarker', function(socketId){
-    //     io.emit('changeGameState', 'Placing markers');
-    // })
+    socket.on('markersPlaced', function(socketId){
+        io.emit('changeGameState', "Initializing");
+    })
 
     socket.on('dealDeck', function (socketId){
         players[socketId].inDeck = shuffle(["playerCard"]);
         console.log(players);
         if(Object.keys(players).length < 2) return;
-        io.emit('changeGameState', "Initializing");
+        io.emit('changeGameState', "Showing markers");
+        //io.emit('changeGameState', "Initializing");
     })
 
     socket.on('dealCards', function (socketId) {
@@ -56,6 +57,11 @@ io.on('connection', function (socket) {
 
     socket.on('cardPlayed', function(cardName, socketId) {
         io.emit('cardPlayed', cardName, socketId);
+        io.emit('changeTurn');
+    })
+
+    socket.on('markerMoved', function(gameObject, socketId){
+        io.emit('markerMoved', gameObject, socketId);
         io.emit('changeTurn');
     })
 

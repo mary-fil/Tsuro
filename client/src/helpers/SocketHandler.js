@@ -16,9 +16,27 @@ export default class SocketHandler{
 
         scene.socket.on('changeGameState', (gameState) => {
             scene.GameHandler.changeGameState(gameState);
-            if(gameState === "Initializing"){
+            if(gameState === "Showing markers"){
+
+                // scene.marker1 = scene.add.circle(200, 250, 10, 0x000000);
+                // scene.marker2 = scene.add.circle(250, 250, 10, 0xff0000);
+                // scene.marker1.name = 'marker1';
+                // scene.marker2.name = 'marker2';
+                // scene.marker1.type = 'marker';
+                // scene.marker2.type = 'marker';
+                // scene.marker1.isPlaced = false;
+                // scene.marker2.isPlaced = false;
+                // scene.marker1.setInteractive({ draggable: true });
+                // scene.marker2.setInteractive({ draggable: true });
+                scene.placeMarkers.setInteractive();
+                scene.placeMarkers.setColor("#00ffff");
+
+            }
+            else if(gameState === "Initializing"){
+                // showing a card on the stack
                 scene.DeckHandler.dealCard(1400 - 25, 300 - 25, "cardBack", "playerCard");
                 //scene.DeckHandler.dealCard(1000, 135, "cardBack", "opponentCard");
+
                 scene.dealCards.setInteractive();
                 scene.dealCards.setColor("#00ffff");
             }
@@ -46,6 +64,26 @@ export default class SocketHandler{
                 scene.DeckHandler.dealCard((scene.dropZone.x - 350) + (scene.dropZone.data.values.cards * 50), scene.dropZone.y, cardName, "opponentCard");
             }
             scene.dropZone.data.values.cards++;
+        })
+
+        scene.socket.on('markerMoved', (marker, socketId) => {
+            let x = marker.x;
+            let y = marker.y;
+            if (socketId === scene.socket.id) {
+                scene.GameHandler.playerMarkerX = x;
+                scene.GameHandler.playerMarkerY = y;
+            } else{
+                scene.marker = scene.add.circle(x, y, 10, 0xff0000);
+                scene.marker.type = 'marker';
+
+                scene.GameHandler.opponentMarkerX = x;
+                scene.GameHandler.opponentMarkerY = y;
+            }
+
+            //if both markers are placed emit markersPlaced
+            if(scene.GameHandler.playerMarkerX !== 200 && scene.GameHandler.playerMarkerY !== 250 && scene.GameHandler.opponentMarkerX !== 200 && scene.GameHandler.opponentMarkerY !== 250){
+                scene.socket.emit('markersPlaced', scene.socket.id);
+            }
         })
     }
 }

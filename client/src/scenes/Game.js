@@ -64,14 +64,7 @@ export class Game extends Scene
             };
         };
 
-        //console.log(layer.getTileAt(0, 0, true).properties.pairs);
-
         map.putTileAt(0,0,1);
-
-        // const tile = map.getTileAt(0,1,true);
-        // tile.properties.name = "tile1";
-
-        // map.putTileAt(6,1,0);
 
         // places for markers
 
@@ -127,15 +120,25 @@ export class Game extends Scene
             place.setInteractive({ dropZone: true });
         });
 
-        // markers
-        let marker1 = this.add.circle(200, 250, 10, 0x000000);
-        let marker2 = this.add.circle(250, 250, 10, 0xff0000);
+        // let marker1 = this.add.circle(200, 250, 10, 0x000000);
+        // let marker2 = this.add.circle(250, 250, 10, 0xff0000);
 
-        marker1.setInteractive({ draggable: true });
-        marker2.setInteractive({ draggable: true });
+        // marker1.setInteractive({ draggable: false });
+        // marker2.setInteractive({ draggable: false });
 
-        marker1.type = 'pawn';
-        marker2.type = 'pawn';
+        // marker1.type = 'marker';
+        // marker2.type = 'marker';
+
+        // marker1.id = 'marker1';
+        // marker2.id = 'marker2';
+
+        // marker1.isPlaced = false;
+        // marker2.isPlaced = false;
+
+        // marker1.setVisible(false);
+        // marker2.setVisible(false);
+
+        // let markerGroup = [marker1, marker2];
 
         // user wants to rotate left
         // take pairs from the tile

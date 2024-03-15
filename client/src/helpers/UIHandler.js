@@ -28,12 +28,11 @@ export class UIHandler {
             scene.playerDeckArea = scene.add.rectangle(1400 - 25, 300 - 25, 150, 150);
             scene.playerDeckArea.setFillStyle(0x668899);
             
-            // scene.opponentDeckArea = scene.add.rectangle(1000, 135, 155, 215);
-            // scene.opponentDeckArea.setStrokeStyle(3, 0x00ffff);
         }
 
         this.buildGameText = () => {
             scene.dealCards = scene.add.text(1350 - 15, 200 - 50, "DEAL CARDS").setFontSize(14).setFontFamily("Trebuchet MS");
+            scene.placeMarkers = scene.add.text(150, 200, "PLACE A MARKER").setFontSize(14).setFontFamily("Trebuchet MS");
         }
 
         this.buildUI = () => {
