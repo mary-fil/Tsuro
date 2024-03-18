@@ -23,8 +23,6 @@ export default class InteractiveHandler{
         //markers
         scene.placeMarkers.on('pointerdown', () => {
             
-            // placing marker
-            // enable moving of the marker
             if (scene.GameHandler.isMyTurn) {
                 scene.marker = scene.add.circle(200, 250, 10, 0x000000);
                 scene.marker.type = 'marker';

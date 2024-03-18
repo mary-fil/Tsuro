@@ -46,25 +46,27 @@ export class Game extends Scene
         let background = this.add.image(800, 350, 'board');
         
         // 600 : 6 = 100
-        const map = this.make.tilemap({ tileWidth: 100, tileHeight: 100, width: 6, height: 6 });
-        const tiles = map.addTilesetImage('tileset');
+        this.map = this.make.tilemap({ tileWidth: 100, tileHeight: 100, width: 6, height: 6 });
+        const tiles = this.map.addTilesetImage('tileset');
 
-        let layer = map.createBlankLayer('layer', tiles);
-        layer.x = 800 - 300;
-        layer.y = 350 - 300;
+        this.layer = this.map.createBlankLayer('layer', tiles);
+        this.layer.x = 800 - 300;
+        this.layer.y = 350 - 300;
 
-        let idx = 0;
-        for (let y = 0; y < map.height; y++) {
-            for (let x = 0; x < map.width; x++) {
-                const tile = layer.getTileAt(x, y, true);
+        let idx = 1;
+        for (let y = 0; y < this.map.height; y++) {
+            for (let x = 0; x < this.map.width; x++) {
+                const tile = this.layer.getTileAt(x, y, true);
                 if (tile) {
+                    tile.properties.name = idx;
                     tile.properties.pairs = pairs[idx];
                     idx++;
                 };
             };
         };
 
-        map.putTileAt(0,0,1);
+        this.map.putTileAt(0,0,1);
+        this.map.putTileAtWorldXY(0, 800, 400);
 
         // places for markers
 
@@ -119,26 +121,6 @@ export class Game extends Scene
         placesGroup.children.each((place) => {
             place.setInteractive({ dropZone: true });
         });
-
-        // let marker1 = this.add.circle(200, 250, 10, 0x000000);
-        // let marker2 = this.add.circle(250, 250, 10, 0xff0000);
-
-        // marker1.setInteractive({ draggable: false });
-        // marker2.setInteractive({ draggable: false });
-
-        // marker1.type = 'marker';
-        // marker2.type = 'marker';
-
-        // marker1.id = 'marker1';
-        // marker2.id = 'marker2';
-
-        // marker1.isPlaced = false;
-        // marker2.isPlaced = false;
-
-        // marker1.setVisible(false);
-        // marker2.setVisible(false);
-
-        // let markerGroup = [marker1, marker2];
 
         // user wants to rotate left
         // take pairs from the tile

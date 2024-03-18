@@ -5,6 +5,7 @@ const shuffle = require('shuffle-array');
 let players = {};
 let readyCheck = 0;
 let gameState = "";
+let deck = [];
 
 const io = require('socket.io')(http, {
     cors: {
@@ -12,6 +13,15 @@ const io = require('socket.io')(http, {
         methods: ["GET", "POST"]
     }
 });
+
+function initializeDeck(){
+    if(deck.length === 0){
+        for(let i = 1; i <= 35; i++){
+            deck.push(i);
+        }
+        shuffle(deck);
+    }
+}
 
 io.on('connection', function (socket) {
     console.log('A user connected: ' + socket.id);
@@ -32,21 +42,23 @@ io.on('connection', function (socket) {
     })
 
     socket.on('dealDeck', function (socketId){
-        players[socketId].inDeck = shuffle(["playerCard"]);
+        initializeDeck();
+
         console.log(players);
+        console.log(deck);
+
         if(Object.keys(players).length < 2) return;
         io.emit('changeGameState', "Showing markers");
-        //io.emit('changeGameState', "Initializing");
     })
 
     socket.on('dealCards', function (socketId) {
+        let dealtCards = deck.splice(0,3)
         for(let i = 0; i < 3; i++){
-            if(players[socketId].inDeck.length === 0){
-                players[socketId].inDeck = shuffle(["playerCard"]);
-            }
-            players[socketId].inHand.push(players[socketId].inDeck.shift());
+            players[socketId].inHand.push(dealtCards[i]);
         }
+        
         console.log(players);
+
         io.emit('dealCards', socketId, players[socketId].inHand);
         readyCheck++;
         if(readyCheck >= 2){

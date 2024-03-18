@@ -1,15 +1,19 @@
 export default class Card {
     constructor (scene) {
-        this.render = (x, y, type, tile) => {
+        this.render = (x, y, type, name) => {
             let sprite;
-            if (this.name === "cardBack" && type === 'playerCard'){
+            if (name === "cardBack" && type === 'playerCard'){
                 sprite = this.playerCardSprite;
-            } else if (this.name === "cardBack" && type === 'opponentCard'){
+            } else if (name === "cardBack" && type === 'opponentCard'){
                 sprite = this.opponentCardSprite;
             }
             else {
-                // if its not a back of a card sprite should be a tile
-                sprite = tile;
+                
+                // does not work
+                console.log(name);
+                scene.map.putTileAtWorldXY(name, x, y);
+                // No need to return anything as tiles are rendered directly onto the layer
+                return null;
             }
             let card = scene.add.image(x, y, sprite).setInteractive().setData({
                 "name": this.name,
