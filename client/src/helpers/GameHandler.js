@@ -3,8 +3,8 @@ export default class GameHandler{
         this.gameState = "Initializing";
         this.isMyTurn = false;
         
-        this.playerDeck = [];
-        this.opponentDeck = [];
+        this.Deck = [];
+        // this.opponentDeck = [];
 
         this.playerHand = [];
         this.opponentHand = [];

@@ -21,6 +21,10 @@ export class Preloader extends Scene
         this.load.image('redtile_back', 'redtile_back.png');
         this.load.image('tileset', 'tiles600v1.png');
         this.load.image('board', 'boardblue.png');
+
+        for (let i = 1; i <= 35; i++) {
+            this.load.image('tile' + i, 'tile (' + i + ').png');
+        }
   
     }
 

@@ -8,22 +8,17 @@ export default class Card {
                 sprite = this.opponentCardSprite;
             }
             else {
-                
-                // does not work
-                console.log(name);
-                scene.map.putTileAtWorldXY(name, x, y);
-                // No need to return anything as tiles are rendered directly onto the layer
-                return null;
+                sprite = "tile" + name; 
             }
             let card = scene.add.image(x, y, sprite).setInteractive().setData({
                 "name": this.name,
                 "type": type,
                 "sprite": sprite,
-                "preview": true
             })
-            if(type === 'playerCard'){
+            if(type === 'playerCard' && name !== "cardBack"){
                 scene.input.setDraggable(card);
-            } else {
+                card.setScale(0.7, 0.7);
+            } else if (type === 'opponentCard' && name === "cardBack"){
                 card.setScale(0.5, 0.5);
             }
             return card;

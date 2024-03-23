@@ -10,7 +10,7 @@ export class UIHandler {
         this.zoneHandler = new ZoneHandler(scene);
 
         this.buildZones = () => {
-            scene.dropZone = this.zoneHandler.renderZone(470, 500);
+            scene.dropZone = this.zoneHandler.renderZone(550, 100);
             this.zoneHandler.renderOutline(scene.dropZone);
         }
 
@@ -36,10 +36,9 @@ export class UIHandler {
         }
 
         this.buildUI = () => {
-            //this.buildZones();
+            this.buildZones();
             this.buildPlayerAreas();
             this.buildGameText();
-            
         }
 
 

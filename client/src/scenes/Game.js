@@ -46,27 +46,30 @@ export class Game extends Scene
         let background = this.add.image(800, 350, 'board');
         
         // 600 : 6 = 100
-        this.map = this.make.tilemap({ tileWidth: 100, tileHeight: 100, width: 6, height: 6 });
-        const tiles = this.map.addTilesetImage('tileset');
+        // this.map = this.make.tilemap({ tileWidth: 100, tileHeight: 100, width: 6, height: 6 });
+        // const tiles = this.map.addTilesetImage('tileset');
 
-        this.layer = this.map.createBlankLayer('layer', tiles);
-        this.layer.x = 800 - 300;
-        this.layer.y = 350 - 300;
+        // this.layer = this.map.createBlankLayer('layer', tiles);
+        // this.layer.x = 800 - 300;
+        // this.layer.y = 350 - 300;
 
-        let idx = 1;
-        for (let y = 0; y < this.map.height; y++) {
-            for (let x = 0; x < this.map.width; x++) {
-                const tile = this.layer.getTileAt(x, y, true);
-                if (tile) {
-                    tile.properties.name = idx;
-                    tile.properties.pairs = pairs[idx];
-                    idx++;
-                };
-            };
-        };
+        // let idx = 1;
+        // for (let y = 0; y < this.map.height; y++) {
+        //     for (let x = 0; x < this.map.width; x++) {
+        //         const tile = this.layer.getTileAt(x, y, true);
+        //         if (tile) {
+        //             tile.properties.name = idx;
+        //             tile.properties.pairs = pairs[idx];
+        //             idx++;
+        //         };
+        //     };
+        // };
 
-        this.map.putTileAt(0,0,1);
-        this.map.putTileAtWorldXY(0, 800, 400);
+        // this.map.putTileAt(0,0,1);
+        // this.map.putTileAtWorldXY(0, 800, 400);
+
+        this.UIHandler = new UIHandler(this);
+        this.UIHandler.buildUI();
 
         // places for markers
 
@@ -133,9 +136,6 @@ export class Game extends Scene
         this.DeckHandler = new DeckHandler(this);
         this.GameHandler = new GameHandler(this);
         this.SocketHandler = new SocketHandler(this);
-        
-        this.UIHandler = new UIHandler(this);
-        this.UIHandler.buildUI();
 
         this.InteractiveHandler = new InteractiveHandler(this, placesGroup);
     }

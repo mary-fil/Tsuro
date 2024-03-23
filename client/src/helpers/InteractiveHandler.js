@@ -4,7 +4,7 @@ export default class InteractiveHandler{
 
         this.placesGroup = this.placesGroup;
 
-        scene.cardPreview = null;
+        //scene.cardPreview = null;
         
         //cards
         scene.dealCards.on('pointerdown', () => {
@@ -41,14 +41,26 @@ export default class InteractiveHandler{
 
         scene.input.on('pointerover', (event, gameObjects) => {
             let pointer = scene.input.activePointer;
-            if(gameObjects[0].type === "Image") {//&& gameObjects[0].data.list.name !== "cardBack" 
-                scene.cardPreview = scene.add.image(pointer.worldX, pointer.worldY, gameObjects[0].data.values.sprite);
+            if(gameObjects[0].type === "Image" && gameObjects[0].data.list.name !== "cardBack" ) {
+                //scene.cardPreview = scene.add.image(pointer.worldX, pointer.worldY, gameObjects[0].data.values.sprite);
+                const image = gameObjects[0];
+                // Show highlight effect
+                if (!scene.highlightEffect) {
+                    scene.highlightEffect = scene.add.graphics(); // Create the highlight effect
+                }
+                scene.highlightEffect.clear(); // Clear previous drawings
+                scene.highlightEffect.lineStyle(4, 0xffffff); // Set the line style for the highlight
+                scene.highlightEffect.strokeRect(image.x - image.displayWidth / 2, image.y - image.displayHeight / 2, image.displayWidth, image.displayHeight);
             }
         })
 
         scene.input.on('pointerout', (event, gameObjects) => {
-            if(gameObjects[0].type === "Image"){//&& gameObjects[0].data.list.name !== "cardBack"
-                scene.cardPreview.setVisible(false);
+            if(gameObjects[0].type === "Image" && gameObjects[0].data.list.name !== "cardBack"){
+                //scene.cardPreview.setVisible(false);
+                // Hide highlight effect
+                if (scene.highlightEffect) {
+                    scene.highlightEffect.clear(); // Clear the highlight effect
+                }
             }
         })
 
@@ -61,7 +73,11 @@ export default class InteractiveHandler{
             if(gameObject.name === "cardBack") {
                 gameObject.setTint(0xff69b4);
                 scene.children.bringToTop(gameObject);
-                scene.cardPreview.setVisible(false);
+                //scene.cardPreview.setVisible(false);
+            } else {
+                if (scene.highlightEffect) {
+                    scene.highlightEffect.clear(); // Clear the highlight effect
+                }
             }
         })
 

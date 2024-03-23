@@ -53,7 +53,7 @@ export default class SocketHandler{
                 }
             } else {
                 for(let i in cards){
-                    let card = scene.GameHandler.opponentHand.push(scene.DeckHandler.dealCard(175 + (i * 75), 550, cards[i], "opponentCard"));
+                    let card = scene.GameHandler.opponentHand.push(scene.DeckHandler.dealCard(175 + (i * 75), 550, "cardBack", "opponentCard"));
                 }
             }
         })
