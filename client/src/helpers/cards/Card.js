@@ -11,7 +11,7 @@ export default class Card {
                 sprite = "tile" + name; 
             }
             let card = scene.add.image(x, y, sprite).setInteractive().setData({
-                "name": this.name,
+                "name": name,
                 "type": type,
                 "sprite": sprite,
             })

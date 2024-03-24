@@ -67,8 +67,8 @@ io.on('connection', function (socket) {
         }
     })
 
-    socket.on('cardPlayed', function(cardName, socketId) {
-        io.emit('cardPlayed', cardName, socketId);
+    socket.on('cardPlayed', function(cardName, socketId, index, x, y) {
+        io.emit('cardPlayed', cardName, socketId, index, x, y);
         io.emit('changeTurn');
     })
 

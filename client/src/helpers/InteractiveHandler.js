@@ -41,10 +41,12 @@ export default class InteractiveHandler{
 
         scene.input.on('pointerover', (event, gameObjects) => {
             let pointer = scene.input.activePointer;
-            if(gameObjects[0].type === "Image" && gameObjects[0].data.list.name !== "cardBack" ) {
-                //scene.cardPreview = scene.add.image(pointer.worldX, pointer.worldY, gameObjects[0].data.values.sprite);
+            const handAreaBounds = { x: 600 - 25, y: 725, width: 450, height: 150 };
+
+            if (gameObjects[0].type === "Image" && gameObjects[0].data.list.name !== "cardBack" &&
+                pointer.x >= handAreaBounds.x && pointer.x <= handAreaBounds.x + handAreaBounds.width &&
+                pointer.y >= handAreaBounds.y && pointer.y <= handAreaBounds.y + handAreaBounds.height) {
                 const image = gameObjects[0];
-                // Show highlight effect
                 if (!scene.highlightEffect) {
                     scene.highlightEffect = scene.add.graphics(); // Create the highlight effect
                 }
@@ -56,8 +58,6 @@ export default class InteractiveHandler{
 
         scene.input.on('pointerout', (event, gameObjects) => {
             if(gameObjects[0].type === "Image" && gameObjects[0].data.list.name !== "cardBack"){
-                //scene.cardPreview.setVisible(false);
-                // Hide highlight effect
                 if (scene.highlightEffect) {
                     scene.highlightEffect.clear(); // Clear the highlight effect
                 }
@@ -73,7 +73,6 @@ export default class InteractiveHandler{
             if(gameObject.name === "cardBack") {
                 gameObject.setTint(0xff69b4);
                 scene.children.bringToTop(gameObject);
-                //scene.cardPreview.setVisible(false);
             } else {
                 if (scene.highlightEffect) {
                     scene.highlightEffect.clear(); // Clear the highlight effect
@@ -118,11 +117,38 @@ export default class InteractiveHandler{
         
                 // If the object is not a pawn, it must be a card
             } else if(scene.GameHandler.isMyTurn && scene.GameHandler.gameState === "Ready") {
-                gameObject.x = (dropZone.x - 350) + (dropZone.data.values.cards * 50);
-                gameObject.y = dropZone.y;
-                scene.dropZone.data.values.cards++;
+
+                // Handling card drop
+                let cellWidth = 100; // Width of each cell in the grid
+                let cellHeight = 100; // Height of each cell in the grid
+                let offsetX = 550 - cellWidth * 3; // X offset to center the grid
+                let offsetY = 100 - cellHeight * 3; // Y offset to center the grid
+                let gridX = Math.floor((pointer.x - offsetX + cellWidth / 2) / cellWidth); // Calculate grid X index
+                let gridY = Math.floor((pointer.y - offsetY + cellHeight / 2) / cellHeight); // Calculate grid Y index
+
+                // Calculate the position of the dropped card within the grid cell
+                let x = offsetX + gridX * cellWidth; 
+                let y = offsetY + gridY * cellHeight; 
+
+                // Move the card to the center of the nearest grid cell
+                gameObject.x = x;
+                gameObject.y = y;
+
                 scene.input.setDraggable(gameObject, false);
-                scene.socket.emit('cardPlayed', gameObject.data.values.name, scene.socket.id);
+                gameObject.setScale(0.65, 0.65);
+
+                // Get the index of the dropped cell in the dropZoneGroup
+                let index = scene.dropZone.getChildren().indexOf(dropZone);
+
+                // Set the cardId of the corresponding cell in the grid
+                let cell = scene.dropZone.getChildren()[index];
+                cell.data.values.cardId = gameObject.data.values.name;
+
+                if(cell.input.enabled){
+                    scene.socket.emit('cardPlayed', gameObject.data.values.name, scene.socket.id, index, gameObject.x, gameObject.y);
+                    cell.disableInteractive();
+                }
+                
             }
             else{
                 gameObject.x = gameObject.input.dragStartX;

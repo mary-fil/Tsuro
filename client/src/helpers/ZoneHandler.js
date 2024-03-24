@@ -8,8 +8,8 @@ export default class ZoneHandler {
 
             for (let i = 0; i < gridSize; i++) {
                 for (let j = 0; j < gridSize; j++) {
-                    const x = startX + i * cellSize;
-                    const y = startY + j * cellSize;
+                    const x = startX + j * cellSize;
+                    const y = startY + i * cellSize;
                     const dropZone = scene.add.zone(x, y, cellSize, cellSize).setRectangleDropZone(cellSize, cellSize);
                     dropZone.setData({
                         "cardId": null

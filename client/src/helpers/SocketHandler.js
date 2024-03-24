@@ -17,20 +17,8 @@ export default class SocketHandler{
         scene.socket.on('changeGameState', (gameState) => {
             scene.GameHandler.changeGameState(gameState);
             if(gameState === "Showing markers"){
-
-                // scene.marker1 = scene.add.circle(200, 250, 10, 0x000000);
-                // scene.marker2 = scene.add.circle(250, 250, 10, 0xff0000);
-                // scene.marker1.name = 'marker1';
-                // scene.marker2.name = 'marker2';
-                // scene.marker1.type = 'marker';
-                // scene.marker2.type = 'marker';
-                // scene.marker1.isPlaced = false;
-                // scene.marker2.isPlaced = false;
-                // scene.marker1.setInteractive({ draggable: true });
-                // scene.marker2.setInteractive({ draggable: true });
                 scene.placeMarkers.setInteractive();
                 scene.placeMarkers.setColor("#00ffff");
-
             }
             else if(gameState === "Initializing"){
                 // showing a card on the stack
@@ -58,12 +46,12 @@ export default class SocketHandler{
             }
         })
 
-        scene.socket.on('cardPlayed', (cardName, socketId) => {
+        scene.socket.on('cardPlayed', (cardName, socketId, index, x, y) => {
             if (socketId !== scene.socket.id) {
                 scene.GameHandler.opponentHand.shift().destroy();
-                scene.DeckHandler.dealCard((scene.dropZone.x - 350) + (scene.dropZone.data.values.cards * 50), scene.dropZone.y, cardName, "opponentCard");
+                let card = scene.add.image(x, y, "tile" + cardName);
+                card.setScale(0.65, 0.65);
             }
-            scene.dropZone.data.values.cards++;
         })
 
         scene.socket.on('markerMoved', (marker, socketId) => {
