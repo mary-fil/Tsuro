@@ -4,7 +4,16 @@ export default class InteractiveHandler{
 
         this.placesGroup = this.placesGroup;
 
-        //scene.cardPreview = null;
+        this.offsets = {
+            1: { x: -50, y: 15 },
+            2: { x: -50, y: -15 },
+            3: { x: -15, y: -50 },
+            4: { x: 15, y: -50 },
+            5: { x: 50, y: 15 },
+            6: { x: 50, y: -15 },
+            7: { x: 15, y: 50 },
+            8: { x: -15, y: 50 }
+        }; 
         
         //cards
         scene.dealCards.on('pointerdown', () => {
@@ -24,10 +33,10 @@ export default class InteractiveHandler{
         scene.placeMarkers.on('pointerdown', () => {
             
             if (scene.GameHandler.isMyTurn) {
-                scene.marker = scene.add.circle(200, 250, 10, 0x000000);
-                scene.marker.type = 'marker';
-                scene.marker.isPlaced = false;
-                scene.marker.setInteractive({ draggable: true });
+                scene.markerPlayer = scene.add.circle(200, 250, 10, 0x000000);
+                scene.markerPlayer.type = 'marker';
+                scene.markerPlayer.isPlaced = false;
+                scene.markerPlayer.setInteractive({ draggable: true });
             }
         })
 
@@ -70,6 +79,7 @@ export default class InteractiveHandler{
         })
 
         scene.input.on('dragstart', (pointer, gameObject) => {
+            gameObject.setDepth(1);
             if(gameObject.name === "cardBack") {
                 gameObject.setTint(0xff69b4);
                 scene.children.bringToTop(gameObject);
@@ -81,6 +91,7 @@ export default class InteractiveHandler{
         })
 
         scene.input.on('dragend', (pointer, gameObject, dropped) => {
+            gameObject.setDepth(0);
             if(gameObject.name === "cardBack") {
                 gameObject.setTint();
             }
@@ -91,6 +102,7 @@ export default class InteractiveHandler{
         })
 
         scene.input.on('drop', (pointer, gameObject, dropZone) => {
+            // marker
             if (scene.GameHandler.isMyTurn && gameObject.type === 'marker') {
                 let droppedInValidPlace = false;
                 placesGroup.children.each(space => {
@@ -104,8 +116,11 @@ export default class InteractiveHandler{
                             gameObject.x = space.x;
                             gameObject.y = space.y;
                             gameObject.disableInteractive();
+
+                            // set starting position of the marker
+                            scene.GameHandler.playerMarkerPosition = space.data.values.position;
+
                             scene.socket.emit('markerMoved', gameObject, scene.socket.id);
-                            console.log(droppedInValidPlace);
                         }
                     }
                 });
@@ -115,7 +130,7 @@ export default class InteractiveHandler{
                     gameObject.y = gameObject.input.dragStartY;
                 }
         
-                // If the object is not a pawn, it must be a card
+            // card
             } else if(scene.GameHandler.isMyTurn && scene.GameHandler.gameState === "Ready") {
 
                 // Handling card drop
@@ -130,23 +145,52 @@ export default class InteractiveHandler{
                 let x = offsetX + gridX * cellWidth; 
                 let y = offsetY + gridY * cellHeight; 
 
-                // Move the card to the center of the nearest grid cell
-                gameObject.x = x;
-                gameObject.y = y;
-
-                scene.input.setDraggable(gameObject, false);
-                gameObject.setScale(0.65, 0.65);
-
                 // Get the index of the dropped cell in the dropZoneGroup
                 let index = scene.dropZone.getChildren().indexOf(dropZone);
 
                 // Set the cardId of the corresponding cell in the grid
                 let cell = scene.dropZone.getChildren()[index];
-                cell.data.values.cardId = gameObject.data.values.name;
 
-                if(cell.input.enabled){
-                    scene.socket.emit('cardPlayed', gameObject.data.values.name, scene.socket.id, index, gameObject.x, gameObject.y);
+                // check if marker is on the boarder of this grid
+                let isMarkerOnBorder = this.isMarkerOnGridBorder(scene.GameHandler.playerMarkerX, scene.GameHandler.playerMarkerY, cell.data.values.gridX, cell.data.values.gridY, cellWidth, cellHeight);
+                //console.log('isMarkerOnBorder: ', isMarkerOnBorder);
+
+                if(cell.input.enabled && isMarkerOnBorder){
+                    // Move the card to the center of the nearest grid cell
+                    gameObject.x = x;
+                    gameObject.y = y;
+
+                    scene.input.setDraggable(gameObject, false);
+                    gameObject.setScale(0.65, 0.65);
+
+                    cell.data.values.cardId = gameObject.data.values.name;
                     cell.disableInteractive();
+
+                    // move marker
+                    // check path that marker can take
+                    // offset table
+                    // pairs table - find the second value of the pair and move marker to new location knowing the offset from the center of the grid x, y
+                    let newPosition = this.getOtherNumber(gameObject.data.values.pairs, scene.GameHandler.playerMarkerPosition);
+                    console.log('new position: ', newPosition);
+
+                    let offset = this.offsets[newPosition];
+                    console.log('offset: ', offset);
+
+                    scene.markerPlayer.x = x + offset.x;
+                    scene.markerPlayer.y = y + offset.y;
+                
+                    // move marker
+                    // update position of marker 
+                    // if there is another path ahead - move marker again until there is no path left
+
+                    // emiting info
+                    scene.socket.emit('cardPlayed', gameObject.data.values.name, scene.socket.id, index, gameObject.x, gameObject.y, scene.markerPlayer.x, scene.markerPlayer.y);
+
+                    // checking pairs
+                    console.log(gameObject.data.values.pairs);
+                }else{
+                    gameObject.x = gameObject.input.dragStartX;
+                    gameObject.y = gameObject.input.dragStartY;
                 }
                 
             }
@@ -156,4 +200,37 @@ export default class InteractiveHandler{
             }
         })
     }
+
+    isMarkerOnGridBorder(markerX, markerY, gridCenterX, gridCenterY, gridWidth, gridHeight) {
+    
+        const halfWidth = gridWidth / 2;
+        const halfHeight = gridHeight / 2;
+    
+        // Check if the marker is on the left or right border
+        if (markerX === gridCenterX - halfWidth || markerX === gridCenterX + halfWidth) {
+            if(markerY > gridCenterY - halfHeight && markerY < gridCenterY + halfHeight){
+                return true;
+            }
+        }
+
+        if (markerY === gridCenterY - halfHeight || markerY === gridCenterY + halfHeight) {
+            if(markerX > gridCenterX - halfWidth || markerX < gridCenterX + halfWidth){
+                return true;
+            }
+        }
+    
+        return false;
+    }
+    
+    getOtherNumber(pairs, number) {
+        for (let i = 0; i < pairs.length; i++) {
+            const pair = pairs[i];
+            if (pair.includes(number)) {
+                return pair.find(num => num !== number);
+            }
+        }
+        // If the number is not found in any pair, return null
+        return null;
+    }
+    
 }

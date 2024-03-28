@@ -46,23 +46,31 @@ export default class SocketHandler{
             }
         })
 
-        scene.socket.on('cardPlayed', (cardName, socketId, index, x, y) => {
+        scene.socket.on('cardPlayed', (cardName, socketId, index, x, y, markerX, markerY) => {
             if (socketId !== scene.socket.id) {
                 scene.GameHandler.opponentHand.shift().destroy();
                 let card = scene.add.image(x, y, "tile" + cardName);
                 card.setScale(0.65, 0.65);
+                card.setDepth(0);
+
+                // move opponent marker
+                scene.markerOpponent.x = markerX;
+                scene.markerOpponent.y = markerY;
             }
         })
 
         scene.socket.on('markerMoved', (marker, socketId) => {
             let x = marker.x;
             let y = marker.y;
+            console.log('marker x: ', x);
+            console.log('marker y: ', y);
+
             if (socketId === scene.socket.id) {
                 scene.GameHandler.playerMarkerX = x;
                 scene.GameHandler.playerMarkerY = y;
             } else{
-                scene.marker = scene.add.circle(x, y, 10, 0xff0000);
-                scene.marker.type = 'marker';
+                scene.markerOpponent = scene.add.circle(x, y, 10, 0xff0000).setDepth(1);
+                scene.markerOpponent.type = 'marker';
 
                 scene.GameHandler.opponentMarkerX = x;
                 scene.GameHandler.opponentMarkerY = y;

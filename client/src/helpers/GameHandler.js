@@ -11,6 +11,7 @@ export default class GameHandler{
 
         this.playerMarkerX = 200;
         this.playerMarkerY = 250;
+        this.playerMarkerPosition = 0;
 
         this.opponentMarkerX = 200;
         this.opponentMarkerY = 250;

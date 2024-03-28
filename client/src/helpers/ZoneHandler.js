@@ -12,7 +12,9 @@ export default class ZoneHandler {
                     const y = startY + i * cellSize;
                     const dropZone = scene.add.zone(x, y, cellSize, cellSize).setRectangleDropZone(cellSize, cellSize);
                     dropZone.setData({
-                        "cardId": null
+                        "cardId": null,
+                        "gridX": x, //top left corner
+                        "gridY": y  
                     });
                     dropZoneGroup.add(dropZone); // Add each cell to the group
                 }
