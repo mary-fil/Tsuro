@@ -31,8 +31,8 @@ export class UIHandler {
         }
 
         this.buildGameText = () => {
-            scene.dealCards = scene.add.text(1350 - 15, 200 - 50, "DEAL CARDS").setFontSize(14).setFontFamily("Trebuchet MS");
-            scene.placeMarkers = scene.add.text(150, 200, "PLACE A MARKER").setFontSize(14).setFontFamily("Trebuchet MS");
+            scene.dealCards = scene.add.text(1350 - 15, 200 - 50, "DEAL CARDS").setFontSize(24).setFontFamily("Trebuchet MS");
+            scene.placeMarkers = scene.add.text(150, 200, "PLACE A MARKER").setFontSize(24).setFontFamily("Trebuchet MS");
         }
 
         this.buildUI = () => {

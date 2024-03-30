@@ -46,16 +46,30 @@ export default class SocketHandler{
             }
         })
 
-        scene.socket.on('cardPlayed', (cardName, socketId, index, x, y, markerX, markerY) => {
+        scene.socket.on('cardPlayed', (newPosition, index, pairs, cardName, socketId, x, y, markerX, markerY) => {
+            scene.GameHandler.Board[index].push(pairs);
+            // checking pairs
+            console.log('gamehandler: ', scene.GameHandler.Board);
+
             if (socketId !== scene.socket.id) {
                 scene.GameHandler.opponentHand.shift().destroy();
+
                 let card = scene.add.image(x, y, "tile" + cardName);
                 card.setScale(0.65, 0.65);
                 card.setDepth(0);
 
-                // move opponent marker
+                // move opponent marker and update all info about the opponent marker
                 scene.markerOpponent.x = markerX;
                 scene.markerOpponent.y = markerY;
+
+                scene.GameHandler.opponentMarkerX = markerX;
+                scene.GameHandler.opponentMarkerY = markerY;
+
+                scene.GameHandler.opponentMarkerPosition = newPosition;
+
+            } else{
+                scene.GameHandler.playerMarkerX = markerX;
+                scene.GameHandler.playerMarkerY = markerY;
             }
         })
 

@@ -70,6 +70,15 @@ export default class Card {
             card.setDepth(0);
             return card;
         }
+
+        this.getPairsByName = (name) => {
+            if (name !== "cardBack") {
+                const sequence = sequences[name - 1];
+                return this.createPairs(sequence);
+            } else {
+                return null; // Return null for cardBack or handle differently if needed
+            }
+        };
     }
 
     createPairs(sequence) {
