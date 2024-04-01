@@ -34,7 +34,7 @@ io.on('connection', function (socket) {
 
     if(Object.keys(players).length < 2){
         players[socket.id].isPlayerA = true;
-        io.emit('firstTurn');
+        io.emit('firstTurn', socket.id);
     }
 
     socket.on('markersPlaced', function(socketId){
@@ -60,6 +60,8 @@ io.on('connection', function (socket) {
         console.log(players);
 
         io.emit('dealCards', socketId, players[socketId].inHand);
+        io.emit('changeTurn');
+
         readyCheck++;
         if(readyCheck >= 2){
             gameState = "Ready";
@@ -67,8 +69,24 @@ io.on('connection', function (socket) {
         }
     })
 
-    socket.on('cardPlayed', function(newPosition, index, pairs, cardName, socketId, x, y, markerX, markerY) {
-        io.emit('cardPlayed', newPosition, index, pairs, cardName, socketId, x, y, markerX, markerY);
+    // socket.on('dealCard', function (socketId) {
+    //     let dealtCard = deck.splice(0,1)
+    //     players[socketId].inHand.push(dealtCard);
+
+    //     console.log(players);
+
+    //     // io.emit('dealCards', socketId, players[socketId].inHand);
+    //     // io.emit('changeTurn');
+        
+    //     // readyCheck++;
+    //     // if(readyCheck >= 2){
+    //     //     gameState = "Ready";
+    //     //     io.emit('changeGameState', 'Ready');
+    //     // }
+    // })
+
+    socket.on('cardPlayed', function(index, pairs, newPosition,  cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndex) {
+        io.emit('cardPlayed', index, pairs, newPosition, cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndex);
         io.emit('changeTurn');
     })
 

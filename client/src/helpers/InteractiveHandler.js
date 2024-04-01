@@ -1,4 +1,6 @@
 
+let playerColor = 0xaa2200;
+
 export default class InteractiveHandler{
     constructor(scene, placesGroup) {
 
@@ -14,38 +16,61 @@ export default class InteractiveHandler{
             7: { x: 15, y: 50 },
             8: { x: -15, y: 50 }
         }; 
-        
-        //cards
-        scene.dealCards.on('pointerdown', () => {
-            scene.socket.emit('dealCards', scene.socket.id);
-            scene.dealCards.disableInteractive();
+
+        scene.dealCardsButton.on('pointerdown', () => {
+            if(scene.GameHandler.isMyTurn){
+                scene.socket.emit('dealCards', scene.socket.id);
+                scene.dealCardsButton.disableInteractive();
+            }
+            // scene.socket.emit('dealCards', scene.socket.id);
+            // scene.dealCardsButton.disableInteractive();
         })
 
-        scene.dealCards.on('pointerover', () => {
-            scene.dealCards.setColor('#336699');
+        scene.dealCardsButton.on('pointerover', () => {
+            // highlight
+            if (!scene.highlightEffect) {
+                scene.highlightEffect = scene.add.graphics(); // Create the highlight effect
+            }
+            scene.highlightEffect.clear(); // Clear previous drawings
+            scene.highlightEffect.lineStyle(4, 0x668899); // Set the line style for the highlight
+            scene.highlightEffect.strokeRect(1400 - 25 - 150/2, 400 - 50/2, 150, 50);
         })
 
-        scene.dealCards.on('pointerout', () => {
-            scene.dealCards.setColor('#000000');
+        scene.dealCardsButton.on('pointerout', () => {
+            // no highlight
+            if (scene.highlightEffect) {
+                scene.highlightEffect.clear(); // Clear the highlight effect
+            }
         })
 
         //markers
-        scene.placeMarkers.on('pointerdown', () => {
+        scene.placeMarkersButton.on('pointerdown', () => {
             
             if (scene.GameHandler.isMyTurn) {
-                scene.markerPlayer = scene.add.circle(200, 250, 10, 0x000000);
+                scene.markerPlayer = scene.add.circle(250 - 25, 300, 10, playerColor);
+                scene.markerPlayer.setStrokeStyle(2, 0x000000);
+
                 scene.markerPlayer.type = 'marker';
                 scene.markerPlayer.isPlaced = false;
                 scene.markerPlayer.setInteractive({ draggable: true });
             }
         })
 
-        scene.placeMarkers.on('pointerover', () => {
-            scene.placeMarkers.setColor('#336699');
+        scene.placeMarkersButton.on('pointerover', () => {
+            // highlight
+            if (!scene.highlightEffect) {
+                scene.highlightEffect = scene.add.graphics(); // Create the highlight effect
+            }
+            scene.highlightEffect.clear(); 
+            scene.highlightEffect.lineStyle(4, 0xffffff); 
+            scene.highlightEffect.strokeRect(250 - 25 - 100/2, 250 - 50/2, 100, 50);
         })
 
-        scene.placeMarkers.on('pointerout', () => {
-            scene.placeMarkers.setColor('#000000');
+        scene.placeMarkersButton.on('pointerout', () => {
+            // no highlight
+            if (scene.highlightEffect) {
+                scene.highlightEffect.clear(); 
+            }
         })
 
         scene.input.on('pointerover', (event, gameObjects) => {
@@ -121,6 +146,11 @@ export default class InteractiveHandler{
                             scene.GameHandler.playerMarkerPosition = space.data.values.position;
 
                             scene.socket.emit('markerMoved', gameObject, scene.socket.id);
+                            scene.placeMarkersButton.setVisible(false);
+                            scene.placeMarkersButton.disableInteractive();
+
+                            scene.placeMarkerArea.setVisible(false);
+                            scene.placeMarkers.setVisible(false);
                         }
                     }
                 });
@@ -167,12 +197,17 @@ export default class InteractiveHandler{
                     cell.data.values.cardId = gameObject.data.values.name;
                     cell.disableInteractive();
 
+                    // update game handler
+                    scene.GameHandler.Board[index].push(gameObject.data.values.pairs);
+                    console.log('gamehandler: ', scene.GameHandler.Board);
+
                     // move marker
                     // check path that marker can take
                     // offset table
                     // pairs table - find the second value of the pair and move marker to new location knowing the offset from the center of the grid x, y
                     let newPosition = this.getOtherNumber(gameObject.data.values.pairs, scene.GameHandler.playerMarkerPosition);
-                    //console.log('new position: ', newPosition);
+                    console.log('starting position: ', scene.GameHandler.playerMarkerPosition);
+                    console.log('ending position: ', newPosition);
 
                     let offset = this.offsets[newPosition];
                     //console.log('offset: ', offset);
@@ -184,103 +219,116 @@ export default class InteractiveHandler{
                     // update position of marker 
                     scene.GameHandler.playerMarkerPosition = this.swapNumbers(newPosition);
                     
-                    // TO DO
                     // if there is another path ahead - move marker again until there is no path left
                     // find another path that is tangent to the marker 
                     // Call the function and store the result
                     let nextIndex = this.getCellsBorderingMarker(index, scene.dropZone, scene.markerPlayer.x, scene.markerPlayer.y, cellWidth, cellHeight);
+                    scene.GameHandler.playerNextIndex = nextIndex;
+                    let nextIndexPlayer = index;
                     //console.log('Bordering cell:', nextIndex);
 
                     // game handler stores pairs that are currently on the cell, so 
                     // i can use this information when looking where to put the marker
                     // i dont need cardId anymore, just index of the grid
 
-                    // if nextIndex === 0, this means that the marker is at the border of the board = END OF GAME
-                    // let position = scene.GameHandler.playerMarkerPosition;
-                    // for(let i = 0; i < 2; i++){
-                    //     console.log('i: ', i);
-                    //     while(nextIndex !== 0){
-                    //         if(scene.GameHandler.Board[nextIndex].length === 0){
-                    //             // cell is empty, there is no card yet
-                    //             break;
-                    //         } else {
-                    //             let pairsArray = scene.GameHandler.Board[nextIndex];
-                    //             console.log('pairs: ', pairsArray);
-                    //             let pairs = pairsArray[0];
+                    // i = 0 player, i = 1 opponent
+                    let position = scene.GameHandler.playerMarkerPosition;
+                    console.log('first position ', position);
+                    let opponentMoved = false;
+                    for(let i = 0; i < 2; i++){
+                        console.log('i: ', i);
+
+                        // if nextIndex === 0, this means that the marker is at the border of the board = END OF GAME
+                        while(nextIndex !== 0){
+                            console.log('while');
+                            if(scene.GameHandler.Board[nextIndex].length === 0){
+                                // cell is empty, there is no card yet
+                                console.log('break');
+                                break;
+                            } else {
+                                let pairsArray = scene.GameHandler.Board[nextIndex];
+                                console.log('pairs: ', pairsArray);
+                                let pairs = pairsArray[0];
     
-                    //             let newPosition = this.getOtherNumber(pairs, scene.GameHandler.playerMarkerPosition);
-                    //             console.log('marker position: ', scene.GameHandler.playerMarkerPosition);
+                                let newPosition = this.getOtherNumber(pairs, position);
+                                console.log('marker position: ', position);
     
-                    //             console.log('new position: ', newPosition);
+                                console.log('new position: ', newPosition);
         
-                    //             let offset = this.offsets[newPosition];
-                    //             console.log('offset: ', offset);
+                                let offset = this.offsets[newPosition];
+                                console.log('offset: ', offset);
         
-                    //             //the center of the nearest grid cell
-                    //             let cell = scene.dropZone.getChildren()[nextIndex];
-                    //             let x = cell.data.values.gridX; // top left corner + halfwidth of cell (100)
-                    //             let y = cell.data.values.gridY;
-                    //             console.log('x: ', x);
-                    //             console.log('y: ', y);
+                                //the center of the nearest grid cell
+                                let cell = scene.dropZone.getChildren()[nextIndex];
+                                let x = cell.data.values.gridX; // top left corner + halfwidth of cell (100)
+                                let y = cell.data.values.gridY;
+                                console.log('x: ', x);
+                                console.log('y: ', y);
         
-                    //             // move marker
-                    //             scene.markerPlayer.x = x + offset.x;
-                    //             scene.markerPlayer.y = y + offset.y;
-                            
-                    //             // update position of marker 
-                    //             scene.GameHandler.playerMarkerPosition = this.swapNumbers(newPosition);
-    
-                    //             // update next index
-                    //             nextIndex = this.getCellsBorderingMarker(nextIndex, scene.dropZone, scene.markerPlayer.x, scene.markerPlayer.y, cellWidth, cellHeight);
-                    //         }
-                    //     }
-                    //     position = scene.GameHandler.opponentMarkerPosition;
-                    //     nextIndex = this.getCellsBorderingMarker(index, scene.dropZone, scene.markerOpponent.x, scene.markerOpponent.y, cellWidth, cellHeight);
-                    //     console.log('Bordering cell:', nextIndex);
-                    // }
-
-                    while(nextIndex !== 0){
-                        if(scene.GameHandler.Board[nextIndex].length === 0){
-                            // cell is empty, there is no card yet
-                            break;
-                        } else {
-                            let pairsArray = scene.GameHandler.Board[nextIndex];
-                            console.log('pairs: ', pairsArray);
-                            let pairs = pairsArray[0];
-
-                            let newPosition = this.getOtherNumber(pairs, scene.GameHandler.playerMarkerPosition);
-                            console.log('marker position: ', scene.GameHandler.playerMarkerPosition);
-
-                            console.log('new position: ', newPosition);
-    
-                            let offset = this.offsets[newPosition];
-                            console.log('offset: ', offset);
-    
-                            //the center of the nearest grid cell
-                            let cell = scene.dropZone.getChildren()[nextIndex];
-                            let x = cell.data.values.gridX; // top left corner + halfwidth of cell (100)
-                            let y = cell.data.values.gridY;
-                            console.log('x: ', x);
-                            console.log('y: ', y);
-    
-                            // move marker
-                            scene.markerPlayer.x = x + offset.x;
-                            scene.markerPlayer.y = y + offset.y;
-                        
-                            // update position of marker 
-                            scene.GameHandler.playerMarkerPosition = this.swapNumbers(newPosition);
-
-                            // update next index
-                            nextIndex = this.getCellsBorderingMarker(nextIndex, scene.dropZone, scene.markerPlayer.x, scene.markerPlayer.y, cellWidth, cellHeight);
+                                // move marker 
+                                if(i === 0){
+                                    scene.markerPlayer.x = x + offset.x;
+                                    scene.markerPlayer.y = y + offset.y;
+                                
+                                    // update position of marker 
+                                    scene.GameHandler.playerMarkerPosition = this.swapNumbers(newPosition);
+        
+                                    // update next index
+                                    nextIndex = this.getCellsBorderingMarker(nextIndex, scene.dropZone, scene.markerPlayer.x, scene.markerPlayer.y, cellWidth, cellHeight);
+                                    if(nextIndex) scene.GameHandler.playerNextIndex = nextIndex;
+                                    console.log('Bordering cell:', nextIndex);
+                                } else {
+                                    scene.markerOpponent.x = x + offset.x;
+                                    scene.markerOpponent.y = y + offset.y;
+                                
+                                    // update position of marker 
+                                    scene.GameHandler.opponentMarkerPosition = this.swapNumbers(newPosition);
+        
+                                    // update next index
+                                    nextIndex = this.getCellsBorderingMarker(nextIndex, scene.dropZone, scene.markerOpponent.x, scene.markerOpponent.y, cellWidth, cellHeight);
+                                    if(nextIndex) scene.GameHandler.opponentNextIndex = nextIndex;
+                                    opponentMoved = true;
+                                    console.log('Bordering cell:', nextIndex);
+                                } 
+                            }
                         }
+                        position = scene.GameHandler.opponentMarkerPosition;
+                        if(position === 0 || i === 1 ) break;
+
+                        // index needs to be different from the player
+                        // TO DO - error when markers align and start from the same border
+                        // when nextIndexPlayer === nextIndex
+                        // something causes error, but i dont know when exactly
+                        nextIndex = scene.GameHandler.opponentNextIndex;
+                        console.log('opponent next index ', nextIndex);
+                        console.log('player first next index ', nextIndexPlayer);
+                        if(nextIndexPlayer !== nextIndex) break;
+
+                        console.log('Bordering cell:', nextIndex);
                     }
+
                     // IMPLEMENT MOVE OF ENEMY MARKER IF YOU MAKE A MOVE
                     console.log('end of while');
 
                     // emiting info
                     // index - index of the dropped cell
                     // rest of the parameters maybe are not necessary
-                    scene.socket.emit('cardPlayed', newPosition, index, gameObject.data.values.pairs, gameObject.data.values.name, scene.socket.id, gameObject.x, gameObject.y, scene.markerPlayer.x, scene.markerPlayer.y);
+                    scene.socket.emit(
+                        'cardPlayed',
+                        index,
+                        gameObject.data.values.pairs,
+                        scene.GameHandler.playerMarkerPosition,
+                        gameObject.data.values.name,
+                        scene.socket.id,
+                        gameObject.x,
+                        gameObject.y,
+                        scene.markerPlayer.x,
+                        scene.markerPlayer.y,
+                        scene.markerOpponent.x,
+                        scene.markerOpponent.y,
+                        opponentMoved,
+                        scene.GameHandler.playerNextIndex
+                    );
                     
                 }else{
                     gameObject.x = gameObject.input.dragStartX;
@@ -330,8 +378,6 @@ export default class InteractiveHandler{
         }
         return 0;
     }
-    
-    
     
     getOtherNumber(pairs, number) {
         for (let i = 0; i < pairs.length; i++) {

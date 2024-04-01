@@ -9,17 +9,18 @@ export class MainMenu extends Scene
 
     create ()
     {
-
-        this.add.text(512, 460, 'Start game', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
+        
+        let startText = this.add.text(800, 450, 'START GAME', {
+            fontFamily: 'Verdana', 
+            fontSize: 50, 
+            color: '#000000',
             align: 'center'
         }).setOrigin(0.5);
 
-        this.input.once('pointerdown', () => {
+        startText.setInteractive(); // Enable input on the text
 
+        startText.on('pointerdown', () => {
             this.scene.start('Game');
-
         });
     }
 }

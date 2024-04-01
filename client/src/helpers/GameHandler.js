@@ -49,10 +49,12 @@ export default class GameHandler{
         this.playerMarkerX = 200;
         this.playerMarkerY = 250;
         this.playerMarkerPosition = 0;
+        this.playerNextIndex = 0;
 
         this.opponentMarkerX = 200;
         this.opponentMarkerY = 250;
         this.opponentMarkerPosition = 0;
+        this.opponentNextIndex = 0;
 
         this.changeTurn = () => {
             this.isMyTurn = !this.isMyTurn;
