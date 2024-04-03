@@ -63,15 +63,14 @@ export default class SocketHandler{
             }
         })
 
-        scene.socket.on('cardPlayed', (index, pairs, newPosition, cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndex) => {
-            // TO DO
-            // if normal move - player moves only - opponent needs to see the change
-            // if player moved and opponents marker moved - opponent needs to see the change 
-            // if opponent moved - player needs to see the change
+        scene.socket.on('cardPlayed', (index, pairs, newPositionPlayer, newPositionOpponent,  cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndexPlayer, nextIndexOpponent) => {
+
             if (socketId !== scene.socket.id) {
                 // if opponent moved
                 scene.GameHandler.opponentHand.shift().destroy();
-                scene.GameHandler.Board[index].push(pairs);
+
+                //scene.GameHandler.Board[index].push(pairs);
+                scene.GameHandler.Board[index] = pairs;
 
                 let card = scene.add.image(x, y, "tile" + cardName);
                 card.setScale(0.65, 0.65);
@@ -84,46 +83,54 @@ export default class SocketHandler{
                 scene.GameHandler.opponentMarkerX = playerMarkerX;
                 scene.GameHandler.opponentMarkerY = playerMarkerY;
 
-                scene.GameHandler.opponentMarkerPosition = newPosition;
-                scene.GameHandler.opponentNextIndex = nextIndex
+                scene.GameHandler.opponentMarkerPosition = newPositionPlayer;
+                scene.GameHandler.opponentNextIndex = nextIndexPlayer
 
                 // update your marker if it was moved
                 if(opponentMoved) {
                     scene.markerPlayer.x = opponentMarkerX;
                     scene.markerPlayer.y = opponentMarkerY;
+
+                    scene.GameHandler.playerMarkerPosition = newPositionOpponent;
+                    scene.GameHandler.playerNextIndex = nextIndexOpponent;
     
-                    scene.GameHandler.playerMarkerX = opponentMarkerX;
-                    scene.GameHandler.playerMarkerY = opponentMarkerY;
+                    // scene.GameHandler.playerMarkerX = opponentMarkerX;
+                    // scene.GameHandler.playerMarkerY = opponentMarkerY;
                 }
 
             } else{
                 // if you moved - is it necessary?
-                scene.GameHandler.playerMarkerX = playerMarkerX;
-                scene.GameHandler.playerMarkerY = playerMarkerY;
+                // scene.GameHandler.playerMarkerX = playerMarkerX;
+                // scene.GameHandler.playerMarkerY = playerMarkerY;
             }
+
+            // after card player
+            // take a card interaction should be available
         })
 
         scene.socket.on('markerMoved', (marker, socketId) => {
             let x = marker.x;
             let y = marker.y;
-            console.log('marker x: ', x);
-            console.log('marker y: ', y);
+            // console.log('marker x: ', x);
+            // console.log('marker y: ', y);
 
             if (socketId === scene.socket.id) {
-                scene.GameHandler.playerMarkerX = x;
-                scene.GameHandler.playerMarkerY = y;
+                // scene.GameHandler.playerMarkerX = x;
+                // scene.GameHandler.playerMarkerY = y;
             } else{
                 scene.markerOpponent = scene.add.circle(x, y, 10, opponentColor).setDepth(1);
                 scene.markerOpponent.setStrokeStyle(2, 0x000000);
                 scene.markerOpponent.type = 'marker';
 
-                scene.GameHandler.opponentMarkerX = x;
-                scene.GameHandler.opponentMarkerY = y;
+                // scene.GameHandler.opponentMarkerX = x;
+                // scene.GameHandler.opponentMarkerY = y;
             }
 
             //if both markers are placed emit markersPlaced
-            if(scene.GameHandler.playerMarkerX !== 200 && scene.GameHandler.playerMarkerY !== 250 && scene.GameHandler.opponentMarkerX !== 200 && scene.GameHandler.opponentMarkerY !== 250){
-                scene.socket.emit('markersPlaced', scene.socket.id);
+            if(scene.markerPlayer && scene.markerOpponent){
+                if(scene.markerPlayer.x !== 200 && scene.markerPlayer.y !== 250 && scene.markerOpponent.x !== 200 && scene.markerOpponent.y !== 250){
+                    scene.socket.emit('markersPlaced', scene.socket.id);
+                }
             }
         })
     }

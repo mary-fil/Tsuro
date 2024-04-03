@@ -74,6 +74,14 @@ export class UIHandler {
             scene.dealCardsButton.setVisible(false);
             scene.dealCards.setVisible(false);
 
+            // take a card button
+            scene.takeCardButton = scene.add.rectangle(1400 - 25, 400, 150, 50, 0x77aadd);
+            scene.takeCard = scene.add.text(scene.takeCardButton.x, scene.takeCardButton.y, "TAKE A CARD", {fontFamily: 'Verdana', fontSize: 18});
+            scene.takeCard.setOrigin(0.5); 
+
+            scene.takeCardButton.setVisible(false);
+            scene.takeCard.setVisible(false);
+
             // place markers button
             scene.placeMarkersButton = scene.add.rectangle(250 - 25, 250, 100, 50, 0x77aadd);
             scene.placeMarkers = scene.add.text(scene.placeMarkersButton.x, scene.placeMarkersButton.y, "PLACE\nMARKER", {fontFamily: 'Verdana', fontSize: 18, align: 'center'});

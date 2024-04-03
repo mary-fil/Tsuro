@@ -69,7 +69,7 @@ io.on('connection', function (socket) {
         }
     })
 
-    // socket.on('dealCard', function (socketId) {
+    // socket.on('takeCard', function (socketId) {
     //     let dealtCard = deck.splice(0,1)
     //     players[socketId].inHand.push(dealtCard);
 
@@ -85,8 +85,8 @@ io.on('connection', function (socket) {
     //     // }
     // })
 
-    socket.on('cardPlayed', function(index, pairs, newPosition,  cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndex) {
-        io.emit('cardPlayed', index, pairs, newPosition, cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndex);
+    socket.on('cardPlayed', function(index, pairs, newPositionPlayer, newPositionOpponent,  cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndexPlayer, nextIndexOpponent) {
+        io.emit('cardPlayed', index, pairs, newPositionPlayer, newPositionOpponent, cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndexPlayer,nextIndexOpponent);
         io.emit('changeTurn');
     })
 
