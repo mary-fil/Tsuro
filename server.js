@@ -27,7 +27,6 @@ io.on('connection', function (socket) {
     console.log('A user connected: ' + socket.id);
 
     players[socket.id] = {
-        inDeck: [],
         inHand: [],
         isPlayerA: false,
     }
@@ -69,30 +68,38 @@ io.on('connection', function (socket) {
         }
     })
 
-    // socket.on('takeCard', function (socketId) {
-    //     let dealtCard = deck.splice(0,1)
-    //     players[socketId].inHand.push(dealtCard);
+    socket.on('takeCard', function (socketId) {
+        let dealtCard = deck.splice(0,1);
 
-    //     console.log(players);
+        players[socketId].inHand.push(dealtCard[0]);
 
-    //     // io.emit('dealCards', socketId, players[socketId].inHand);
-    //     // io.emit('changeTurn');
-        
-    //     // readyCheck++;
-    //     // if(readyCheck >= 2){
-    //     //     gameState = "Ready";
-    //     //     io.emit('changeGameState', 'Ready');
-    //     // }
-    // })
+        console.log(players);
+
+        io.emit('dealCards', socketId, dealtCard);
+        io.emit('changeTurn');
+    })
 
     socket.on('cardPlayed', function(index, pairs, newPositionPlayer, newPositionOpponent,  cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndexPlayer, nextIndexOpponent) {
+        // delete card from the hand
+        let indexOfCard = players[socketId].inHand.indexOf(cardName);
+        players[socketId].inHand.splice(indexOfCard,1);
+        console.log(players);
+
         io.emit('cardPlayed', index, pairs, newPositionPlayer, newPositionOpponent, cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndexPlayer,nextIndexOpponent);
-        io.emit('changeTurn');
+        //io.emit('changeTurn');
     })
 
     socket.on('markerMoved', function(gameObject, socketId){
         io.emit('markerMoved', gameObject, socketId);
         io.emit('changeTurn');
+    })
+
+    socket.on('pathPlaced', function(isPlayer, x, y, start, end, socketId){
+        io.emit('pathPlaced', isPlayer, x, y, start, end, socketId);
+    })
+
+    socket.on('gameOver', function(isPlayer, socketId){
+        io.emit('gameOver', isPlayer, socketId);
     })
 
 })

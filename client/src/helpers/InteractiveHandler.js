@@ -1,5 +1,6 @@
 
 let playerColor = 0xaa2200;
+let opponentPath = 0x005492;
 
 export default class InteractiveHandler{
     constructor(scene, placesGroup) {
@@ -20,9 +21,8 @@ export default class InteractiveHandler{
         // take card
         scene.takeCardButton.on('pointerdown', () => {
             if(scene.GameHandler.isMyTurn){
-                // scene.takeCardButton.setVisible(true);
-                // scene.takeCardButton.setInteractive();
-                // scene.takeCard.setVisible(true);
+                scene.takeCardButton.disableInteractive();
+                scene.socket.emit('takeCard', scene.socket.id);
             }
         })
 
@@ -47,10 +47,16 @@ export default class InteractiveHandler{
         scene.dealCardsButton.on('pointerdown', () => {
             if(scene.GameHandler.isMyTurn){
                 scene.socket.emit('dealCards', scene.socket.id);
+
+                // disable deal cards button
                 scene.dealCardsButton.disableInteractive();
+                scene.dealCardsButton.setVisible(false);
+                scene.dealCards.setVisible(false);
+
+                // enable take card button
+                scene.takeCardButton.setVisible(true);
+                scene.takeCard.setVisible(true);
             }
-            // scene.socket.emit('dealCards', scene.socket.id);
-            // scene.dealCardsButton.disableInteractive();
         })
 
         scene.dealCardsButton.on('pointerover', () => {
@@ -179,6 +185,7 @@ export default class InteractiveHandler{
                         
                             scene.placeMarkerArea.setVisible(false);
                             scene.placeMarkers.setVisible(false);
+
                         }
                         
                     }
@@ -240,8 +247,13 @@ export default class InteractiveHandler{
                     console.log('starting position: ', scene.GameHandler.playerMarkerPosition);
                     console.log('ending position: ', newPosition);
 
+                    // show path
+                    let pathStart = scene.GameHandler.playerMarkerPosition;
+                    let pathEnd = newPosition;
+                    let isPlayer = true;
+                    scene.socket.emit('pathPlaced', isPlayer, x, y, pathStart, pathEnd, scene.socket.id,);
+                    
                     let offset = this.offsets[newPosition];
-                    //console.log('offset: ', offset);
 
                     // move marker
                     scene.markerPlayer.x = x + offset.x;
@@ -258,9 +270,10 @@ export default class InteractiveHandler{
                     let nextIndexPlayer = index;
                     //console.log('Bordering cell:', nextIndex);
 
-                    // game handler stores pairs that are currently on the cell, so 
-                    // i can use this information when looking where to put the marker
-                    // i dont need cardId anymore, just index of the grid
+                    // if nextIndex === null, this means that the marker is at the border of the board = END OF GAME
+                    if(nextIndex === null){
+                        scene.socket.emit('gameOver', isPlayer, scene.socket.id,);
+                    }
 
                     // i = 0 player, i = 1 opponent
                     let position = scene.GameHandler.playerMarkerPosition;
@@ -270,8 +283,7 @@ export default class InteractiveHandler{
                     let gameOver = false;
                     for(let i = 0; i < 2; i++){
                         console.log('i: ', i);
-
-                        // if nextIndex === 0, this means that the marker is at the border of the board = END OF GAME
+                        
                         while(nextIndex){
                             console.log('while');
                             if(scene.GameHandler.Board[nextIndex].length === 0){
@@ -302,6 +314,10 @@ export default class InteractiveHandler{
                                 if(i === 0){
                                     scene.markerPlayer.x = x + offset.x;
                                     scene.markerPlayer.y = y + offset.y;
+
+                                    // show path
+                                    let isPlayer = true;
+                                    scene.socket.emit('pathPlaced', isPlayer, x, y, position, newPosition, scene.socket.id);
                                 
                                     // update position of marker 
                                     scene.GameHandler.playerMarkerPosition = this.swapNumbers(newPosition);
@@ -314,13 +330,18 @@ export default class InteractiveHandler{
                                         scene.GameHandler.playerNextIndex = nextIndex;
                                         console.log('Bordering cell:', nextIndex);
                                     } else{
-                                        gameOver = true;
+                                        // if nextIndex === null, this means that the marker is at the border of the board = END OF GAME
+                                        scene.socket.emit('gameOver', isPlayer, scene.socket.id,);
                                         console.log('GAME OVER FOR PLAYER');
                                     }
                                     
                                 } else {
                                     scene.markerOpponent.x = x + offset.x;
                                     scene.markerOpponent.y = y + offset.y;
+
+                                    // show path
+                                    let isPlayer = false;
+                                    scene.socket.emit('pathPlaced', isPlayer, x, y, position, newPosition, scene.socket.id);
                                 
                                     // update position of marker 
                                     scene.GameHandler.opponentMarkerPosition = this.swapNumbers(newPosition);
@@ -333,7 +354,7 @@ export default class InteractiveHandler{
                                         scene.GameHandler.opponentNextIndex = nextIndex;
                                         console.log('Bordering cell:', nextIndex);
                                     } else{
-                                        gameOver = true;
+                                        scene.socket.emit('gameOver', isPlayer, scene.socket.id,);
                                         console.log('GAME OVER FOR OPPONENT');
                                     }
                                     
@@ -380,6 +401,7 @@ export default class InteractiveHandler{
                         scene.GameHandler.playerNextIndex,
                         scene.GameHandler.opponentNextIndex
                     );
+                    scene.takeCardButton.setInteractive();
                     
                 }else{
                     gameObject.x = gameObject.input.dragStartX;
@@ -392,6 +414,12 @@ export default class InteractiveHandler{
                 gameObject.y = gameObject.input.dragStartY;
             }
         })
+
+        // scene.input.on('pointerdown', (pointer, gameObject) =>{
+        //     if (scene.GameHandler.isMyTurn && gameObject.type !== 'marker' && scene.GameHandler.gameState === "Ready"){
+
+        //     }
+        // })
     }
 
     isMarkerOnGridBorder(markerX, markerY, gridCenterX, gridCenterY, gridWidth, gridHeight) {

@@ -114,6 +114,11 @@ export class Game extends Scene
         // rotate the sprite aswell
         // update the pairs of the tile
 
+        // testing paths
+        // let tile = this.add.image(1400, 650, 'tile2');
+        // let path = this.add.image(1400, 650, '2_8');
+        // path.setTint(0x005492);
+
         // handlers
         this.CardHandler = new CardHandler();
         this.DeckHandler = new DeckHandler(this);

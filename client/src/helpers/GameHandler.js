@@ -44,7 +44,10 @@ export default class GameHandler{
           }          
 
         this.playerHand = [];
+        this.playerHandObjects = [];
+
         this.opponentHand = [];
+        this.opponentHandObjects = [];
 
         this.playerMarkerX = 200;
         this.playerMarkerY = 250;
