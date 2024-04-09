@@ -2,6 +2,7 @@ export default class GameHandler{
     constructor(scene) {
         this.gameState = "Initializing";
         this.isMyTurn = false;
+        this.isDeckEmpty = false;
         
         this.Deck = [];
         this.Board = {

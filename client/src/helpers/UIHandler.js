@@ -86,6 +86,13 @@ export class UIHandler {
             scene.placeMarkersButton = scene.add.rectangle(250 - 25, 250, 100, 50, 0x77aadd);
             scene.placeMarkers = scene.add.text(scene.placeMarkersButton.x, scene.placeMarkersButton.y, "PLACE\nMARKER", {fontFamily: 'Verdana', fontSize: 18, align: 'center'});
             scene.placeMarkers.setOrigin(0.5); 
+
+            // rotate all cards button
+            scene.rotateCardsButton = scene.add.rectangle(1100, 800-15, 100, 50, 0x77aadd);
+            scene.rotateCards= scene.add.text(scene.rotateCardsButton.x, scene.rotateCardsButton.y, "ROTATE\nRIGHT", {fontFamily: 'Verdana', fontSize: 18, align: 'center'});
+            scene.rotateCards.setOrigin(0.5); 
+
+            scene.rotateCardsButton.disableInteractive();
         }
 
         this.buildUI = () => {

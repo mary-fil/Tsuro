@@ -69,6 +69,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on('takeCard', function (socketId) {
+
         let dealtCard = deck.splice(0,1);
 
         players[socketId].inHand.push(dealtCard[0]);
@@ -76,16 +77,23 @@ io.on('connection', function (socket) {
         console.log(players);
 
         io.emit('dealCards', socketId, dealtCard);
+
+        // if deck is empty inform all clients about no cards left and disable take cards button
+        // if there are no cards left and last player moved then end game in a draw
+        if(deck.length === 0){
+            io.emit('deckEmpty');
+        }
+
         io.emit('changeTurn');
     })
 
-    socket.on('cardPlayed', function(index, pairs, newPositionPlayer, newPositionOpponent,  cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndexPlayer, nextIndexOpponent) {
+    socket.on('cardPlayed', function(index, angle, pairs, newPositionPlayer, newPositionOpponent,  cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndexPlayer, nextIndexOpponent) {
         // delete card from the hand
         let indexOfCard = players[socketId].inHand.indexOf(cardName);
         players[socketId].inHand.splice(indexOfCard,1);
         console.log(players);
 
-        io.emit('cardPlayed', index, pairs, newPositionPlayer, newPositionOpponent, cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndexPlayer,nextIndexOpponent);
+        io.emit('cardPlayed', index, angle, pairs, newPositionPlayer, newPositionOpponent, cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndexPlayer,nextIndexOpponent);
         //io.emit('changeTurn');
     })
 
@@ -98,8 +106,8 @@ io.on('connection', function (socket) {
         io.emit('pathPlaced', isPlayer, x, y, start, end, socketId);
     })
 
-    socket.on('gameOver', function(isPlayer, socketId){
-        io.emit('gameOver', isPlayer, socketId);
+    socket.on('gameOver', function(isDraw, isPlayer, socketId){
+        io.emit('gameOver', isDraw, isPlayer, socketId);
     })
 
 })

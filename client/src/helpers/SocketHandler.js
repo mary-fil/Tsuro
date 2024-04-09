@@ -45,6 +45,11 @@ export default class SocketHandler{
         })
 
         scene.socket.on('changeTurn', () => {
+            // if there are no cards left in players hand END GAME
+            if(scene.GameHandler.playerHand.length === 0 && scene.GameHandler.isDeckEmpty){
+                scene.socket.emit('gameOver', true, true, scene.socket.id);
+            }
+
             scene.GameHandler.changeTurn();
             if(scene.GameHandler.isMyTurn) {
                 scene.playerTurnText.setVisible(true); 
@@ -69,9 +74,9 @@ export default class SocketHandler{
                 let cardData = cards[i];
         
                 let emptySpaceIndex = handToUpdate.findIndex(card => !card);
-                console.log('player hand: ', scene.GameHandler.playerHand);
-                console.log('opponent hand: ', scene.GameHandler.opponentHand);
-                console.log('empty space index: ', emptySpaceIndex);
+                //console.log('player hand: ', scene.GameHandler.playerHand);
+                //console.log('opponent hand: ', scene.GameHandler.opponentHand);
+                //console.log('empty space index: ', emptySpaceIndex);
         
                 // If there's an empty space, place the new card in that space
                 if (emptySpaceIndex !== -1) {
@@ -80,8 +85,9 @@ export default class SocketHandler{
                     handToUpdate[emptySpaceIndex] = cardData;
                     if(socketId !== scene.socket.id) cardData = "cardBack";
 
-                    //let newcard = handToUpdateObjects.push(scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard"));
-                    scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard");
+                    let newcard = handToUpdateObjects.push(scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard"));
+                    //scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard");
+
                 } else {
                     // If there's no empty space, add the new card at the end of the hand
                     let x = xStart + (socketId === scene.socket.id ? numExistingCards * 150 : numExistingCards * 75); 
@@ -89,15 +95,16 @@ export default class SocketHandler{
                     handToUpdate.push(cardData);
                     if(socketId !== scene.socket.id) cardData = "cardBack";
 
-                    //let newcard = handToUpdateObjects.push(scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard"));
-                    scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard");
+                    let newcard = handToUpdateObjects.push(scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard"));
+                    //scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard");
+
                     numExistingCards++; 
                 }
             }
         });
         
 
-        scene.socket.on('cardPlayed', (index, pairs, newPositionPlayer, newPositionOpponent,  cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndexPlayer, nextIndexOpponent) => {
+        scene.socket.on('cardPlayed', (index, pairs, angle, newPositionPlayer, newPositionOpponent,  cardName, socketId, x, y, playerMarkerX, playerMarkerY, opponentMarkerX, opponentMarkerY, opponentMoved, nextIndexPlayer, nextIndexOpponent) => {
             
             if (socketId !== scene.socket.id) {
                 // if opponent moved
@@ -112,7 +119,9 @@ export default class SocketHandler{
 
                 scene.GameHandler.Board[index] = pairs;
 
+                // change angle if needed
                 let card = scene.add.image(x, y, "tile" + cardName);
+                card.angle += angle;
                 card.setScale(0.65, 0.65);
                 card.setDepth(0);
 
@@ -169,7 +178,7 @@ export default class SocketHandler{
             if (!(scene.textures.exists(key))) {
                 key = end + "_" + start;  
             }
-            console.log(key);
+            //console.log(key);
 
             let path = scene.add.image(x, y, key);
             path.setScale(0.65, 0.65);
@@ -192,9 +201,22 @@ export default class SocketHandler{
             }
         })
 
-        scene.socket.on('gameOver', (isPlayer, socketId) => {
-            
-            if(socketId === scene.socket.id){
+        scene.socket.on('deckEmpty', () =>{
+            scene.gameHandler.isDeckEmpty = true;
+
+            // disable take card button
+            scene.takeCardButton.setVisible(false);
+            scene.takeCard.setVisible(false);
+
+            // hide the card sprite
+            scene.playerDeckArea.setDepth(3);
+        })
+
+        scene.socket.on('gameOver', (isDraw, isPlayer, socketId) => {
+            if(isDraw){
+                this.scene.scene.start('GameOver', { text: "It's a draw!" });
+            }
+            else if(socketId === scene.socket.id){
                 if(isPlayer){
                     this.scene.scene.start('GameOver', { text: "You've lost :(" });
                 }else{

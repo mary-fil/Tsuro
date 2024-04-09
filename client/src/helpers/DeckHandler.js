@@ -12,10 +12,10 @@ export default class DeckHandler{
 
             let newCard;
             if(name === "cardBack"){
-                console.log(name);
+                //console.log(name);
                 newCard = new CardBack(scene);
             } else{
-                console.log(name);
+                //console.log(name);
                 newCard = new Card(scene);
             }
             

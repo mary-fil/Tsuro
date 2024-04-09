@@ -59,7 +59,8 @@ export default class Card {
                 "name": name,
                 "type": type,
                 "sprite": sprite,
-                "pairs": pairs
+                "pairs": pairs,
+                "angle": 0
             })
             if(type === 'playerCard' && name !== "cardBack"){
                 scene.input.setDraggable(card);
@@ -87,13 +88,5 @@ export default class Card {
             pairs.push([sequence[i], sequence[i + 1]]);
         }
         return pairs;
-    }
-    
-    rotateRight(array) {
-        return array.map(pair => pair.map(num => (num + 2 > 8) ? num + 2 - 8 : num + 2));
-    }
-    
-    rotateLeft(array) {
-        return array.map(pair => pair.map(num => (num - 2 < 1) ? num - 2 + 8 : num - 2));
     }
 }

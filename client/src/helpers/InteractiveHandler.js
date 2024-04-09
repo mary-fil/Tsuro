@@ -22,6 +22,8 @@ export default class InteractiveHandler{
         scene.takeCardButton.on('pointerdown', () => {
             if(scene.GameHandler.isMyTurn){
                 scene.takeCardButton.disableInteractive();
+                scene.rotateCardsButton.setInteractive();
+
                 scene.socket.emit('takeCard', scene.socket.id);
             }
         })
@@ -56,6 +58,9 @@ export default class InteractiveHandler{
                 // enable take card button
                 scene.takeCardButton.setVisible(true);
                 scene.takeCard.setVisible(true);
+
+                // enable rotate cards button
+                scene.rotateCardsButton.setInteractive();
             }
         })
 
@@ -70,6 +75,42 @@ export default class InteractiveHandler{
         })
 
         scene.dealCardsButton.on('pointerout', () => {
+            // no highlight
+            if (scene.highlightEffect) {
+                scene.highlightEffect.clear(); // Clear the highlight effect
+            }
+        })
+
+        // rotate cards
+        scene.rotateCardsButton.on('pointerdown', () =>{
+            // it should be interactive only before placing a card 
+            // after placing a card disable button
+            if (scene.GameHandler.isMyTurn && scene.GameHandler.gameState === "Ready"){
+                for(let i = 0; i < 3; i++){
+                    let card = scene.GameHandler.playerHandObjects[i];
+
+                    let initialPairs = card.data.values.pairs;
+                    let rotatedPairs = this.rotatePairsRight(initialPairs);
+                    card.data.values.pairs = rotatedPairs;
+                    console.log("Rotated pairs:", rotatedPairs);
+
+                    card.angle += 90;
+                    card.data.values.angle = (card.data.values.angle + 90) % 360;
+                }
+            }
+        })
+
+        scene.rotateCardsButton.on('pointerover', () => {
+            // highlight
+            if (!scene.highlightEffect) {
+                scene.highlightEffect = scene.add.graphics(); // Create the highlight effect
+            }
+            scene.highlightEffect.clear(); // Clear previous drawings
+            scene.highlightEffect.lineStyle(4, 0x668899); // Set the line style for the highlight
+            scene.highlightEffect.strokeRect(1100 - 100/2, 800 -15 - 50/2, 100, 50);
+        })
+
+        scene.rotateCardsButton.on('pointerout', () => {
             // no highlight
             if (scene.highlightEffect) {
                 scene.highlightEffect.clear(); // Clear the highlight effect
@@ -237,7 +278,7 @@ export default class InteractiveHandler{
                     //scene.GameHandler.Board[index].push(gameObject.data.values.pairs);
                     scene.GameHandler.Board[index] = gameObject.data.values.pairs;
 
-                    console.log('gamehandler: ', scene.GameHandler.Board);
+                    //console.log('gamehandler: ', scene.GameHandler.Board);
 
                     // move marker
                     // check path that marker can take
@@ -268,11 +309,12 @@ export default class InteractiveHandler{
                     let nextIndex = this.getCellsBorderingMarker(index, scene.dropZone, scene.markerPlayer.x, scene.markerPlayer.y, cellWidth, cellHeight);
                     scene.GameHandler.playerNextIndex = nextIndex;
                     let nextIndexPlayer = index;
-                    //console.log('Bordering cell:', nextIndex);
+                    console.log('Bordering cell:', nextIndex);
 
                     // if nextIndex === null, this means that the marker is at the border of the board = END OF GAME
                     if(nextIndex === null){
-                        scene.socket.emit('gameOver', isPlayer, scene.socket.id,);
+                        console.log('gameOver nr 1');
+                        //scene.socket.emit('gameOver', false, isPlayer, scene.socket.id,);
                     }
 
                     // i = 0 player, i = 1 opponent
@@ -284,11 +326,11 @@ export default class InteractiveHandler{
                     for(let i = 0; i < 2; i++){
                         console.log('i: ', i);
                         
-                        while(nextIndex){
-                            console.log('while');
+                        while(nextIndex !== null){
+                            //console.log('while');
                             if(scene.GameHandler.Board[nextIndex].length === 0){
                                 // cell is empty, there is no card yet
-                                console.log('break');
+                                //console.log('break');
                                 break;
                             } else {
                                 let pairs = scene.GameHandler.Board[nextIndex];
@@ -307,8 +349,8 @@ export default class InteractiveHandler{
                                 let cell = scene.dropZone.getChildren()[nextIndex];
                                 let x = cell.data.values.gridX; // top left corner + halfwidth of cell (100)
                                 let y = cell.data.values.gridY;
-                                console.log('x: ', x);
-                                console.log('y: ', y);
+                                //console.log('x: ', x);
+                                //console.log('y: ', y);
         
                                 // move marker 
                                 if(i === 0){
@@ -326,13 +368,13 @@ export default class InteractiveHandler{
         
                                     // update next index
                                     nextIndex = this.getCellsBorderingMarker(nextIndex, scene.dropZone, scene.markerPlayer.x, scene.markerPlayer.y, cellWidth, cellHeight);
-                                    if(nextIndex) {
+                                    if(nextIndex !== null) {
                                         scene.GameHandler.playerNextIndex = nextIndex;
                                         console.log('Bordering cell:', nextIndex);
                                     } else{
                                         // if nextIndex === null, this means that the marker is at the border of the board = END OF GAME
-                                        scene.socket.emit('gameOver', isPlayer, scene.socket.id,);
-                                        console.log('GAME OVER FOR PLAYER');
+                                        console.log('gameOver nr 2');
+                                        //scene.socket.emit('gameOver', false, isPlayer, scene.socket.id);
                                     }
                                     
                                 } else {
@@ -350,12 +392,12 @@ export default class InteractiveHandler{
         
                                     // update next index
                                     nextIndex = this.getCellsBorderingMarker(nextIndex, scene.dropZone, scene.markerOpponent.x, scene.markerOpponent.y, cellWidth, cellHeight);
-                                    if(nextIndex) {
+                                    if(nextIndex !== null) {
                                         scene.GameHandler.opponentNextIndex = nextIndex;
                                         console.log('Bordering cell:', nextIndex);
                                     } else{
-                                        scene.socket.emit('gameOver', isPlayer, scene.socket.id,);
-                                        console.log('GAME OVER FOR OPPONENT');
+                                        console.log('gameOver nr 3');
+                                        //scene.socket.emit('gameOver', false, isPlayer, scene.socket.id);
                                     }
                                     
                                     opponentMoved = true;
@@ -369,16 +411,16 @@ export default class InteractiveHandler{
                         if(gameOver || position === 0 || i === 1 ) break;
                         
                         nextIndex = scene.GameHandler.opponentNextIndex;
-                        console.log('opponent next index ', nextIndex);
-                        console.log('player first next index ', index);
+                        //console.log('opponent next index ', nextIndex);
+                        //console.log('player first next index ', index);
 
                         // if dropped card does not affect the opponent - break
                         if(nextIndex !== index) break;
-                        console.log('Bordering cell:', nextIndex);
+                        //console.log('Bordering cell:', nextIndex);
                     }
 
                     // IMPLEMENT MOVE OF ENEMY MARKER IF YOU MAKE A MOVE
-                    console.log('end of while');
+                    //console.log('end of while');
 
                     // emiting info
                     // index - index of the dropped cell
@@ -387,6 +429,7 @@ export default class InteractiveHandler{
                         'cardPlayed',
                         index,
                         gameObject.data.values.pairs,
+                        gameObject.data.values.angle,
                         scene.GameHandler.playerMarkerPosition,
                         scene.GameHandler.opponentMarkerPosition,
                         gameObject.data.values.name,
@@ -402,6 +445,7 @@ export default class InteractiveHandler{
                         scene.GameHandler.opponentNextIndex
                     );
                     scene.takeCardButton.setInteractive();
+                    scene.rotateCardsButton.disableInteractive();
                     
                 }else{
                     gameObject.x = gameObject.input.dragStartX;
@@ -414,12 +458,14 @@ export default class InteractiveHandler{
                 gameObject.y = gameObject.input.dragStartY;
             }
         })
+    }
 
-        // scene.input.on('pointerdown', (pointer, gameObject) =>{
-        //     if (scene.GameHandler.isMyTurn && gameObject.type !== 'marker' && scene.GameHandler.gameState === "Ready"){
+    rotatePairsRight(array) {
+        return array.map(pair => pair.map(num => (num + 2 > 8) ? num + 2 - 8 : num + 2));
+    }
 
-        //     }
-        // })
+    rotatePairsLeft(array) {
+        return array.map(pair => pair.map(num => (num - 2 < 1) ? num - 2 + 8 : num - 2));
     }
 
     isMarkerOnGridBorder(markerX, markerY, gridCenterX, gridCenterY, gridWidth, gridHeight) {
