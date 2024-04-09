@@ -85,8 +85,14 @@ export default class SocketHandler{
                     handToUpdate[emptySpaceIndex] = cardData;
                     if(socketId !== scene.socket.id) cardData = "cardBack";
 
-                    let newcard = handToUpdateObjects.push(scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard"));
+                    //let newcard = handToUpdateObjects.push(scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard"));
                     //scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard");
+
+                    let newCard = scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard");
+                    handToUpdateObjects[emptySpaceIndex] = newCard;
+
+                    console.log('handToUpdateObjects: ', handToUpdateObjects);
+                    console.log('index of taken card: ', emptySpaceIndex);
 
                 } else {
                     // If there's no empty space, add the new card at the end of the hand
@@ -147,7 +153,16 @@ export default class SocketHandler{
             }else{
                 let indexOfCard = scene.GameHandler.playerHand.indexOf(cardName);
                 scene.GameHandler.playerHand[indexOfCard] = null;
-                //scene.GameHandler.playerHandObjects.shift().destroy();
+
+                // TODO does it work?
+                let card = scene.add.image(x, y, "tile" + cardName);
+                card.angle += angle;
+                card.setScale(0.65, 0.65);
+                card.setDepth(0);
+
+                scene.GameHandler.playerHandObjects[indexOfCard] = null;
+                console.log('handToUpdateObjects after placing card: ', scene.GameHandler.playerHandObjects);
+                console.log('index of destroyed card: ', indexOfCard);
             } 
         })
 
@@ -182,6 +197,7 @@ export default class SocketHandler{
 
             let path = scene.add.image(x, y, key);
             path.setScale(0.65, 0.65);
+            path.setDepth(1);
 
             // player moved
             if (socketId === scene.socket.id){

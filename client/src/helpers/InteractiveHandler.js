@@ -87,6 +87,7 @@ export default class InteractiveHandler{
             // after placing a card disable button
             if (scene.GameHandler.isMyTurn && scene.GameHandler.gameState === "Ready"){
                 for(let i = 0; i < 3; i++){
+                    console.log('rotated card i: ', i);
                     let card = scene.GameHandler.playerHandObjects[i];
 
                     let initialPairs = card.data.values.pairs;
@@ -123,6 +124,7 @@ export default class InteractiveHandler{
             if (scene.GameHandler.isMyTurn) {
                 scene.markerPlayer = scene.add.circle(250 - 25, 300, 10, playerColor);
                 scene.markerPlayer.setStrokeStyle(2, 0x000000);
+                scene.markerPlayer.setDepth(2);
 
                 scene.markerPlayer.type = 'marker';
                 //scene.markerPlayer.isPlaced = false;
@@ -314,7 +316,7 @@ export default class InteractiveHandler{
                     // if nextIndex === null, this means that the marker is at the border of the board = END OF GAME
                     if(nextIndex === null){
                         console.log('gameOver nr 1');
-                        //scene.socket.emit('gameOver', false, isPlayer, scene.socket.id,);
+                        scene.socket.emit('gameOver', false, isPlayer, scene.socket.id,);
                     }
 
                     // i = 0 player, i = 1 opponent
@@ -374,7 +376,7 @@ export default class InteractiveHandler{
                                     } else{
                                         // if nextIndex === null, this means that the marker is at the border of the board = END OF GAME
                                         console.log('gameOver nr 2');
-                                        //scene.socket.emit('gameOver', false, isPlayer, scene.socket.id);
+                                        scene.socket.emit('gameOver', false, isPlayer, scene.socket.id);
                                     }
                                     
                                 } else {
@@ -397,7 +399,7 @@ export default class InteractiveHandler{
                                         console.log('Bordering cell:', nextIndex);
                                     } else{
                                         console.log('gameOver nr 3');
-                                        //scene.socket.emit('gameOver', false, isPlayer, scene.socket.id);
+                                        scene.socket.emit('gameOver', false, isPlayer, scene.socket.id);
                                     }
                                     
                                     opponentMoved = true;
