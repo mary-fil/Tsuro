@@ -53,11 +53,14 @@ export default class InteractiveHandler{
                 // disable deal cards button
                 scene.dealCardsButton.disableInteractive();
                 scene.dealCardsButton.setVisible(false);
+                scene.dealCardsButtonShadow.setVisible(false);
+
                 scene.dealCards.setVisible(false);
 
                 // enable take card button
                 scene.takeCardButton.setVisible(true);
                 scene.takeCard.setVisible(true);
+                scene.takeCardButtonShadow.setVisible(true);
 
                 // enable rotate cards button
                 scene.rotateCardsButton.setInteractive();
@@ -122,12 +125,11 @@ export default class InteractiveHandler{
         scene.placeMarkersButton.on('pointerdown', () => {
             
             if (scene.GameHandler.isMyTurn) {
-                scene.markerPlayer = scene.add.circle(250 - 25, 300, 10, playerColor);
+                scene.markerPlayer = scene.add.circle(250 - 25, 300 + 10, 10, playerColor);
                 scene.markerPlayer.setStrokeStyle(2, 0x000000);
-                scene.markerPlayer.setDepth(2);
+                scene.markerPlayer.setDepth(3);
 
                 scene.markerPlayer.type = 'marker';
-                //scene.markerPlayer.isPlaced = false;
                 scene.markerPlayer.setInteractive({ draggable: true });
                 scene.placeMarkersButton.disableInteractive();
             }
@@ -181,7 +183,7 @@ export default class InteractiveHandler{
         })
 
         scene.input.on('dragstart', (pointer, gameObject) => {
-            gameObject.setDepth(1);
+            gameObject.setDepth(3);
             if(gameObject.name === "cardBack") {
                 gameObject.setTint(0xff69b4);
                 scene.children.bringToTop(gameObject);
@@ -228,6 +230,8 @@ export default class InteractiveHandler{
                         
                             scene.placeMarkerArea.setVisible(false);
                             scene.placeMarkers.setVisible(false);
+                            scene.placeMarkersButtonShadow.setVisible(false);
+                            scene.placeMarkerAreaShadow.setVisible(false);
 
                         }
                         

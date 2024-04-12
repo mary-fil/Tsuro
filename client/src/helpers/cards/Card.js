@@ -77,7 +77,7 @@ export default class Card {
                 const sequence = sequences[name - 1];
                 return this.createPairs(sequence);
             } else {
-                return null; // Return null for cardBack or handle differently if needed
+                return null; 
             }
         };
     }

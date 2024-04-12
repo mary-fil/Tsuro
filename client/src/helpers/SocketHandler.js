@@ -39,6 +39,7 @@ export default class SocketHandler{
 
                 scene.dealCardsButton.setVisible(true);
                 scene.dealCards.setVisible(true);
+                scene.dealCardsButtonShadow.setVisible(true);
 
                 scene.dealCardsButton.setInteractive();
             }
@@ -65,7 +66,7 @@ export default class SocketHandler{
             let handToUpdateObjects = socketId === scene.socket.id ? scene.GameHandler.playerHandObjects : scene.GameHandler.opponentHandObjects;
 
             let xStart = socketId === scene.socket.id ? 650 : 150; 
-            let yStart = socketId === scene.socket.id ? 800 - 15 : 550; 
+            let yStart = socketId === scene.socket.id ? 800 - 15 : 800 - 15; 
         
             // Find the number of cards already in the hand
             let numExistingCards = handToUpdate.length;
@@ -116,7 +117,7 @@ export default class SocketHandler{
                 // if opponent moved
                 let indexOfCard = scene.GameHandler.opponentHand.indexOf(cardName);
                 scene.GameHandler.opponentHand[indexOfCard] = null;
-                //scene.GameHandler.opponentHandObjects.shift().destroy();
+                scene.GameHandler.opponentHandObjects.shift().destroy();
                 // TO DO - debug and show the placing of a card of the opponent
                 // maybe use cardsleft variable or sth
 

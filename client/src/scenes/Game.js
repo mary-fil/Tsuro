@@ -16,12 +16,6 @@ export class Game extends Scene
 
     create ()
     {  
-        // let sequence = sequences[0];
-        // let pairs = this.createPairs(sequence);
-
-        // console.log(pairs);
-        // console.log(this.rotateLeft(pairs));
-
         // create border
         let border = this.add.graphics();
         border.fillStyle(0x336699, 1);
@@ -58,7 +52,6 @@ export class Game extends Scene
         for(let i = 1; i <= 2; i++){
             for(let i = 1; i <=placesPerSide/2; i++){
                 let place = this.add.circle(coordX, coordY, circleRadius, 0xeecc66);
-                // Add the circle to the group
                 placesGroup.add(place);
                 place.setData({
                     position: pos2
@@ -83,7 +76,6 @@ export class Game extends Scene
         for(let i = 1; i <= 2; i++){
             for(let i = 1; i <=placesPerSide/2; i++){
                 let place = this.add.circle(coordX, coordY, circleRadius, 0xeecc66);
-                // Add the circle to the group
                 placesGroup.add(place);
                 place.setData({
                     position: pos3
@@ -107,17 +99,6 @@ export class Game extends Scene
         placesGroup.children.each((place) => {
             place.setInteractive({ dropZone: true });
         });
-
-        // user wants to rotate left
-        // take pairs from the tile
-        // rotate it how many times the user wants
-        // rotate the sprite aswell
-        // update the pairs of the tile
-
-        // testing paths
-        // let tile = this.add.image(1400, 650, 'tile2');
-        // let path = this.add.image(1400, 650, '2_8');
-        // path.setTint(0x005492);
 
         // handlers
         this.CardHandler = new CardHandler();

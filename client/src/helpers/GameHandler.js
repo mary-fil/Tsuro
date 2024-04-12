@@ -50,13 +50,13 @@ export default class GameHandler{
         this.opponentHand = [];
         this.opponentHandObjects = [];
 
-        this.playerMarkerX = 200;
-        this.playerMarkerY = 250;
+        this.playerMarkerX = 225;
+        this.playerMarkerY = 310;
         this.playerMarkerPosition = 0;
         this.playerNextIndex = 0;
 
-        this.opponentMarkerX = 200;
-        this.opponentMarkerY = 250;
+        this.opponentMarkerX = 225;
+        this.opponentMarkerY = 310;
         this.opponentMarkerPosition = 0;
         this.opponentNextIndex = 0;
 
