@@ -64,6 +64,11 @@ export default class InteractiveHandler{
 
                 // enable rotate cards button
                 scene.rotateCardsButton.setInteractive();
+
+                // enable third set of rules
+                scene.rulesMarker.setVisible(false);
+                scene.rulesDealCards.setVisible(false);
+                scene.rulesTakeCard.setVisible(true);
             }
         })
 
@@ -164,7 +169,7 @@ export default class InteractiveHandler{
                     scene.highlightEffect = scene.add.graphics(); // Create the highlight effect
                 }
                 scene.highlightEffect.clear(); // Clear previous drawings
-                scene.highlightEffect.lineStyle(4, 0xffffff); // Set the line style for the highlight
+                scene.highlightEffect.lineStyle(5, 0xffffff); // Set the line style for the highlight
                 scene.highlightEffect.strokeRect(image.x - image.displayWidth / 2, image.y - image.displayHeight / 2, image.displayWidth, image.displayHeight);
             }
         })
@@ -223,15 +228,21 @@ export default class InteractiveHandler{
                         
                             // set starting position of the marker
                             scene.GameHandler.playerMarkerPosition = space.data.values.position;
-                        
+                            
+                            // disable place marker button
                             scene.socket.emit('markerMoved', gameObject, scene.socket.id);
                             scene.placeMarkersButton.setVisible(false);
                             scene.placeMarkersButton.disableInteractive();
-                        
+                            
+                            // disable place marker area
                             scene.placeMarkerArea.setVisible(false);
                             scene.placeMarkers.setVisible(false);
                             scene.placeMarkersButtonShadow.setVisible(false);
                             scene.placeMarkerAreaShadow.setVisible(false);
+
+                            // enable second set of rules
+                            scene.rulesMarker.setVisible(false);
+                            scene.rulesDealCards.setVisible(true);
 
                         }
                         

@@ -49,13 +49,35 @@ export class UIHandler {
             scene.add.rectangle(250 - 25 - shadowOffset, 100 + shadowOffset, 250, 75).setFillStyle(0x000000).setAlpha(shadowAlpha).setBlendMode(mode);
             scene.gameStateArea = scene.add.rectangle(250 - 25, 100, 250, 75);
             scene.gameStateArea.setFillStyle(0x668899);
+
+            // Rules of the game
+            scene.rulesAreaShadow = scene.add.rectangle(250 - 25 - shadowOffset, 550 - 25 + shadowOffset, 250, 190).setFillStyle(0x000000).setAlpha(shadowAlpha).setBlendMode(mode);
+            scene.rulesArea = scene.add.rectangle(250 - 25, 550 - 25, 250, 190);
+            scene.rulesArea.setFillStyle(0x668899);
         }      
 
         this.buildGameText = () => {
  
             const blendMode = Phaser.BlendModes.NORMAL;
 
-            // turn text
+            let rulesMarkerText = "1. Wait for your turn. \n2. To start the game, click\non the place marker button.\n3. Drag the marker onto one\nof the yellow circles."
+            let rulesDealCardsText = "1. Wait for your turn. \n2. Click on deal cards button \nto deal cards for yourself."
+            let rulesTakeCardText = "1. Wait for your turn. \n2. You can rotate your cards\nusing rotate right button.\n3. Place a tile adjacent to your\nmarker.\n4. Take a card to end a turn.\n5. If your marker reaches the\nedge of the board, you've lost.\n6 The last player remaining wins."
+
+            // rules header
+            let rules = scene.add.rectangle(250 - 25, scene.rulesArea.y - 95, 125, 25, opponentZoneColor);
+            let rulesText = scene.add.text(rules.x, rules.y, "RULES", { fontFamily: 'Verdana', fontSize: 18, color: '#ffffff' });
+            rulesText.setOrigin(0.5); 
+
+            // rules 
+            scene.rulesMarker = scene.add.text(115, scene.rulesArea.y - 80, rulesMarkerText, { fontFamily: 'Verdana', fontSize: 15, color: '#ffffff' , align: 'left'});
+            scene.rulesDealCards = scene.add.text(115, scene.rulesArea.y - 80, rulesDealCardsText, { fontFamily: 'Verdana', fontSize: 15, color: '#ffffff' , align: 'left'});
+            scene.rulesTakeCard = scene.add.text(105, scene.rulesArea.y - 80, rulesTakeCardText, { fontFamily: 'Verdana', fontSize: 15, color: '#ffffff' , align: 'left'});
+            scene.rulesMarker.setVisible(true);
+            scene.rulesDealCards.setVisible(false);
+            scene.rulesTakeCard.setVisible(false);
+
+            // turn header
             let turn = scene.add.rectangle(250 - 25, scene.gameStateArea.y - 35, 125, 25, opponentZoneColor);
             let textTurn = scene.add.text(turn.x, turn.y, "TURN", { fontFamily: 'Verdana', fontSize: 18, color: '#ffffff' });
             textTurn.setOrigin(0.5); 

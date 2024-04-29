@@ -75,6 +75,10 @@ export default class SocketHandler{
                 let cardData = cards[i];
         
                 let emptySpaceIndex = handToUpdate.findIndex(card => !card);
+
+                // if(socketId !== scene.socket.id){
+                //     emptySpaceIndex = 0;
+                // }
                 //console.log('player hand: ', scene.GameHandler.playerHand);
                 //console.log('opponent hand: ', scene.GameHandler.opponentHand);
                 //console.log('empty space index: ', emptySpaceIndex);
@@ -86,14 +90,13 @@ export default class SocketHandler{
                     handToUpdate[emptySpaceIndex] = cardData;
                     if(socketId !== scene.socket.id) cardData = "cardBack";
 
-                    //let newcard = handToUpdateObjects.push(scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard"));
-                    //scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard");
-
                     let newCard = scene.DeckHandler.dealCard(x, yStart, cardData, socketId === scene.socket.id ? "playerCard" : "opponentCard");
                     handToUpdateObjects[emptySpaceIndex] = newCard;
 
                     console.log('handToUpdateObjects: ', handToUpdateObjects);
                     console.log('index of taken card: ', emptySpaceIndex);
+
+                    //if(socketId !== scene.socket.id) break;
 
                 } else {
                     // If there's no empty space, add the new card at the end of the hand
@@ -117,12 +120,8 @@ export default class SocketHandler{
                 // if opponent moved
                 let indexOfCard = scene.GameHandler.opponentHand.indexOf(cardName);
                 scene.GameHandler.opponentHand[indexOfCard] = null;
-                scene.GameHandler.opponentHandObjects.shift().destroy();
-                // TO DO - debug and show the placing of a card of the opponent
-                // maybe use cardsleft variable or sth
-
-                // SHOW ROTATION
-                // SHOW PATH
+                scene.GameHandler.opponentHandObjects[indexOfCard].destroy();
+                scene.GameHandler.opponentHandObjects[indexOfCard] = null;
 
                 scene.GameHandler.Board[index] = pairs;
 
