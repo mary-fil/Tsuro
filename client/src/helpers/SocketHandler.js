@@ -229,20 +229,23 @@ export default class SocketHandler{
         })
 
         scene.socket.on('gameOver', (isDraw, isPlayer, socketId) => {
+            let winner = "Congratulations! You won!";
+            let loser = "You lost."
+
             if(isDraw){
                 this.scene.scene.start('GameOver', { text: "It's a draw!" });
             }
             else if(socketId === scene.socket.id){
                 if(isPlayer){
-                    this.scene.scene.start('GameOver', { text: "You've lost :(" });
+                    this.scene.scene.start('GameOver', { text: loser });
                 }else{
-                    this.scene.scene.start('GameOver', { text: "You've won :)" });
+                    this.scene.scene.start('GameOver', { text: winner });
                 }
             }else{
                 if(isPlayer){
-                    this.scene.scene.start('GameOver', { text: "You've won :)" });
+                    this.scene.scene.start('GameOver', { text: winner});
                 }else{
-                    this.scene.scene.start('GameOver', { text: "You've lost :(" });
+                    this.scene.scene.start('GameOver', { text: loser });
                 }
             }
         })
